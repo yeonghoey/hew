@@ -39,6 +39,7 @@ setup(
         'pyperclip==1.6.0',
         'PyQt5==5.10',
         'pysrt==1.1.1',
+        'python-vlc==3.0.101',
         'SpeechRecognition==3.8.1',
     ],
 

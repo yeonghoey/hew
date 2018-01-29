@@ -1,13 +1,20 @@
-from functools import wraps
 from inspect import getargspec
 
 
-class Context:
-    def __init__(self):
+class Scheme:
+    def __init__(self, *schemes):
         self.targets = {}
+        for scheme in schemes:
+            for f in scheme.targets.values():
+                self(f)
 
     def __call__(self, f):
-        self.targets[f.__name__] = f
+        name = f.__name__
+
+        if name in self.targets:
+            raise RuntimeError('Name conflicts: "%s": (%r, %r)' %
+                               (name, self.targets[name], f))
+        self.targets[name] = f
         return f
 
     def build(self, ctx):
@@ -19,7 +26,8 @@ class Context:
                 if not ok:
                     next_[name] = f
             if next_ == targets:
-                raise ValueError('Cannot resolve dependencies: %r', targets)
+                raise RuntimeError('Cannot resolve dependencies: %r, %r' %
+                                   (targets, ctx.keys()))
 
 
 def try_run(f, ctx):
