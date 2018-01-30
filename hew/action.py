@@ -155,3 +155,10 @@ def resize_player(player, player_default_size):
         w, h = player_default_size
         player.setFixedSize(w*scale, h*scale)
     return f
+
+
+@scheme
+def set_position(vlc_main):
+    def f(ms):
+        vlc_main.set_time(ms)
+    return f

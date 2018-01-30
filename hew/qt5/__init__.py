@@ -22,5 +22,4 @@ def app():
 
 @scheme
 def screen(app):
-    g = app.desktop().screenGeometry()
-    return (g.width(), g.height())
+    return app.desktop().screenGeometry()

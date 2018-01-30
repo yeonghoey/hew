@@ -35,21 +35,28 @@ def video(source_path):
 def player_default_size(video, screen):
     # Determine the base size based on the media
     # When it's audio, just set zero
-    w, h = (video.size if video is not None else
-            (0, 0))
+    if video is None:
+        return None
 
+    w, h = video.size
     # For convenience, do not let the deault size
     # be larger than half the screen size
-    sw, sh = screen
+    sw, sh = screen.width(), screen.height()
     while w > sw*.5 or h > sh*.5:
         w, h = w*.5, h*.5
+
     return (w, h)
 
 
 @scheme
-def clamp(audio):
+def duration(audio):
+    return audio.duration*1000
+
+
+@scheme
+def clamp(duration):
     def f(ms):
-        return min(max(ms, 0), audio.duration*1000)
+        return min(max(ms, 0), duration)
     return f
 
 

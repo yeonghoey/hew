@@ -17,8 +17,9 @@ def vlc_main(vlc_instance, player, source_path):
     p = vlc_instance.media_player_new(source_path)
 
     # NOTE: only support macOS currently
-    nsview = int(player.winId())
-    p.set_nsobject(nsview)
+    if player is not None:
+        nsview = int(player.winId())
+        p.set_nsobject(nsview)
     p.play()
     return p
 
