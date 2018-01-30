@@ -85,7 +85,7 @@ def hew(vlc_main,
         audio,
         state,
         pause,
-        play_hewed):
+        play_hewn):
 
     def f():
         left = state['left']
@@ -94,16 +94,16 @@ def hew(vlc_main,
             return
 
         pause()
-        hewed = audio.subclip(left/1000., right/1000.)
+        hewn = audio.subclip(left/1000., right/1000.)
         now = datetime.now().strftime('%Y%m%d-%H%M%S')
         filename = now + '.mp3'
         filepath = os.path.join(anki_media, filename)
-        hewed.write_audiofile(filepath, verbose=False, progress_bar=False)
-        state['last_hewed_path'] = filepath
+        hewn.write_audiofile(filepath, verbose=False, progress_bar=False)
+        state['last_hewn_path'] = filepath
         state['last_left'] = left
         state['last_right'] = right
 
-        play_hewed()
+        play_hewn()
 
         # Seek to the right end
         vlc_main.set_time(right)
@@ -112,9 +112,9 @@ def hew(vlc_main,
 
 
 @scheme
-def play_hewed(vlc_sub, state, pause, show_action):
+def play_hewn(vlc_sub, state, pause, show_action):
     def f():
-        path = state['last_hewed_path']
+        path = state['last_hewn_path']
         left = state['left']
         right = state['right']
         if not path:
@@ -125,8 +125,8 @@ def play_hewed(vlc_sub, state, pause, show_action):
         vlc_sub.play()
 
         filename = os.path.basename(path)
-        hewed_duration = format_timedelta(right - left)
-        show_action('%s (%s)' % (filename, hewed_duration))
+        hewn_duration = format_timedelta(right - left)
+        show_action('%s (%s)' % (filename, hewn_duration))
     return f
 
 
@@ -135,12 +135,12 @@ def dump(anki_media,
          state,
          srt,
          extract_subtitles,
-         recognize_hewed,
+         recognize_hewn,
          clip,
          show_action):
 
     def f(do_transcript):
-        path = state['last_hewed_path']
+        path = state['last_hewn_path']
         if not path:
             return
 
@@ -152,7 +152,7 @@ def dump(anki_media,
         sound_str = '[sound:%s]' % filename
         if do_transcript:
             transcript = (extract_subtitles(left, right) if srt else
-                          recognize_hewed(path))
+                          recognize_hewn(path))
             text = '%s\n%s' % (sound_str, transcript.strip())
             clip(text)
         else:

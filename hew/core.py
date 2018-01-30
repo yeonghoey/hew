@@ -54,7 +54,7 @@ def state():
         'right': 0,
         'last_left': 0,
         'last_right': 0,
-        'last_hewed_path': '',
+        'last_hewn_path': '',
         'scale': 1.,
     }
 
@@ -80,7 +80,7 @@ def extract_subtitles(subtitles, srt_padding):
 
 
 @scheme
-def recognize_hewed(state):
+def recognize_hewn(state):
     def f(path):
         mp3 = AudioFileClip(path)
         _, wav_path = tempfile.mkstemp('.wav')
