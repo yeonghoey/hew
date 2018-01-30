@@ -4,7 +4,7 @@ import tempfile
 
 import pyperclip
 import pysrt
-from moviepy.editor import AudioFileClip
+from moviepy.editor import AudioFileClip, VideoFileClip
 import speech_recognition as sr
 
 from hew.util import Scheme
@@ -16,6 +16,34 @@ scheme = Scheme()
 @scheme
 def audio(source_path):
     return AudioFileClip(source_path)
+
+
+@scheme
+def video(source_path):
+    _, ext = os.path.splitext(source_path)
+
+    # FIXME: Hard coded to check whenter or not a file is video,
+    # because I failed to figure out a proper way
+    # to differenciate audio files from video files
+    if ext in ('.mp3', '.wav'):
+        return None
+    else:
+        return VideoFileClip(source_path)
+
+
+@scheme
+def player_default_size(video, screen):
+    # Determine the base size based on the media
+    # When it's audio, just set zero
+    w, h = (video.size if video is not None else
+            (0, 0))
+
+    # For convenience, do not let the deault size
+    # be larger than half the screen size
+    sw, sh = screen
+    while w > sw*.5 or h > sh*.5:
+        w, h = w*.5, h*.5
+    return (w, h)
 
 
 @scheme

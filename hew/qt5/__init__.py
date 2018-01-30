@@ -18,3 +18,9 @@ def app():
     # SEE: https://doc.qt.io/qt-5/qapplication.html#QApplication
     argv = sys.argv[:1]
     return QApplication(argv)
+
+
+@scheme
+def screen(app):
+    g = app.desktop().screenGeometry()
+    return (g.width(), g.height())

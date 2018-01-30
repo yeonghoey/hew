@@ -9,7 +9,6 @@ scheme = Scheme()
 @scheme
 def window(app, body):
     w = QMainWindow()
-    w.setFixedSize(800, 600)
     w.setCentralWidget(body)
     w.show()
     return w
@@ -31,8 +30,9 @@ def layout(app, player, button):
 
 
 @scheme
-def player(app):
+def player(app, player_default_size):
     w = QWidget()
+    w.setFixedSize(*player_default_size)
     return w
 
 

@@ -147,3 +147,11 @@ def dump(anki_media,
             clip(sound_str)
 
     return f
+
+
+@scheme
+def resize_player(player, player_default_size):
+    def f(scale=1.):
+        w, h = player_default_size
+        player.setFixedSize(w*scale, h*scale)
+    return f
