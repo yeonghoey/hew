@@ -18,7 +18,7 @@ def quit_(app):
 def toggle(vlc_main, vlc_sub, play, pause):
     def f():
         if vlc_main.is_playing():
-            pause(1)
+            pause()
         else:
             if vlc_sub.is_playing():
                 vlc_sub.stop()
