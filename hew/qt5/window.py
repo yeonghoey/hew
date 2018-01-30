@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QSlider, QHBoxLayout, QVBoxLayout, QWidget, QLabel
+from PyQt5.QtWidgets import (
+    QSlider, QHBoxLayout, QVBoxLayout, QWidget, QLabel, QTextEdit)
 
 from hew.qt5.mixin import DraggingMixin
 from hew.util import format_timedelta, format_timedelta_range, Scheme
@@ -27,9 +28,12 @@ def window(app, screen, layout, player_view):
     if player_view is None:
         w.move(screen.center() - w.rect().center())
     else:
-        # Center player_view, put window below it.
-        player_view.move(screen.center() - player_view.rect().center())
-        w.move(player_view.x(), player_view.y() + player_view.height())
+        # x: center based on player_view
+        # y: center based on both
+        center = screen.center() - player_view.rect().center()
+        cx, cy = center.x(), center.y() - w.height()/2
+        player_view.move(cx, cy)
+        w.move(cx, cy + player_view.height())
 
     return w
 
@@ -47,10 +51,11 @@ def player_view(app, player_default_size):
 
 
 @scheme
-def layout(app, indicator_layout, slider):
+def layout(app, indicator_layout, slider, clipbox):
     box = QVBoxLayout()
     box.addLayout(indicator_layout)
     box.addWidget(slider)
+    box.addWidget(clipbox)
     return box
 
 
@@ -60,7 +65,7 @@ def indicator_layout(app,
                      time_label,
                      mark_label,
                      action_label,
-                     str_width):
+                     font_metrics):
     left = QVBoxLayout()
     left.addWidget(title_label)
     left.addWidget(time_label, alignment=Qt.AlignLeft)
@@ -71,7 +76,7 @@ def indicator_layout(app,
 
     box = QHBoxLayout()
     box.addLayout(left)
-    box.addSpacing(str_width('mm'))
+    box.addSpacing(font_metrics.width('mm'))
     box.addLayout(right)
     return box
 
@@ -83,10 +88,10 @@ def title_label(app, title):
 
 
 @scheme
-def time_label(app, str_width):
+def time_label(app, font_metrics):
     z = format_timedelta(0)
     w = QLabel(z)
-    width = str_width(z)
+    width = font_metrics.width(z)
     w.setFixedWidth(width)
     return w
 
@@ -98,10 +103,10 @@ def action_label(app):
 
 
 @scheme
-def mark_label(app, str_width):
+def mark_label(app, font_metrics):
     z = format_timedelta_range(left_ms=0, right_ms=0)
     w = QLabel(z)
-    width = str_width(z)
+    width = font_metrics.width(z)
     w.setFixedWidth(width)
     return w
 
@@ -120,6 +125,14 @@ def slider(app, duration, time_label, set_position):
     s.valueChanged.connect(update_display)
 
     return s
+
+
+@scheme
+def clipbox(app, font_metrics):
+    w = QTextEdit()
+    w.setReadOnly(True)
+    w.setFixedHeight(font_metrics.lineSpacing() * 5)
+    return w
 
 
 @scheme

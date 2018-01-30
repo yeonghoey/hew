@@ -27,10 +27,6 @@ def screen(app):
 
 
 @scheme
-def str_width(app):
-    def f(s):
-        font = QFont()
-        metrics = QFontMetrics(font)
-        return metrics.width(s)
-
-    return f
+def font_metrics(app):
+    font = QFont()
+    return QFontMetrics(font)

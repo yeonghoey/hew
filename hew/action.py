@@ -160,9 +160,10 @@ def dump(anki_media,
 
 
 @scheme
-def clip():
+def clip(clipbox):
     def f(s):
         pyperclip.copy(s)
+        clipbox.setText(s)
     return f
 
 
