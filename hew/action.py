@@ -3,7 +3,7 @@ import os
 
 import pyperclip
 
-from hew.util import format_timedelta, Scheme
+from hew.util import format_timedelta, format_timedelta_range, Scheme
 
 
 scheme = Scheme()
@@ -57,12 +57,13 @@ def seek(vlc_main, clamp, show_action):
 
 
 @scheme
-def mark(vlc_main, state, show_action):
+def mark(vlc_main, state, show_action, update_mark):
     def f(side):
         assert side == 'left' or side == 'right'
         state[side] = vlc_main.get_time()
         td = format_timedelta(state[side])
-        show_action('mark (%s): %s' % (side, td))
+        show_action('%s %s' % (side, td))
+        update_mark(state['left'], state['right'])
     return f
 
 
@@ -72,7 +73,7 @@ def adjust(state, clamp, show_action):
         assert side == 'left' or side == 'right'
         t = state[side] + ms
         state[side] = clamp(t)
-        show_action('adjust (%s): %+dms' % (side, ms))
+        show_action('%s %+dms' % (side, ms))
     return f
 
 
@@ -83,7 +84,7 @@ def hew(vlc_main,
         audio,
         state,
         pause,
-        show_action):
+        play_hewed):
 
     def f():
         left = state['left']
@@ -100,26 +101,29 @@ def hew(vlc_main,
         state['last_hewed_path'] = filepath
         state['last_left'] = left
         state['last_right'] = right
-        vlc_sub.set_mrl(filepath)
-        vlc_sub.play()
+
+        play_hewed()
+
         # Seek to the right end
         vlc_main.set_time(right)
-
-        hewed_duration = format_timedelta(right - left)
-        show_action('hew: %s (%s)' % (filename, hewed_duration))
 
     return f
 
 
 @scheme
-def replay_hewed(vlc_sub, state, pause, show_action):
+def play_hewed(vlc_sub, state, pause, show_action):
     def f():
         path = state['last_hewed_path']
+        left = state['left']
+        right = state['right']
         if not path:
             return
         vlc_sub.set_mrl(path)
         vlc_sub.play()
-        show_action('replay: %s' % os.path.basename(path))
+
+        filename = os.path.basename(path)
+        hewed_duration = format_timedelta(right - left)
+        show_action('%s (%s)' % (filename, hewed_duration))
     return f
 
 
@@ -150,7 +154,7 @@ def dump(anki_media,
             clip(text)
         else:
             clip(sound_str)
-        show_action('dump: %s' % filename)
+        show_action('dump')
 
     return f
 
@@ -184,4 +188,12 @@ def set_position(vlc_main):
 def show_action(action_label):
     def f(s):
         action_label.setText(s)
+    return f
+
+
+@scheme
+def update_mark(mark_label):
+    def f(l, r):
+        s = format_timedelta_range(l, r)
+        mark_label.setText(s)
     return f

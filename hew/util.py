@@ -45,3 +45,9 @@ def format_timedelta(ms1):
     m1, s = divmod(s1, 60)
     h, m = divmod(m1, 60)
     return '%d:%02d:%02d.%d' % (h, m, s, ms // 100)
+
+
+def format_timedelta_range(left_ms, right_ms):
+    ltd = format_timedelta(left_ms)
+    rtd = format_timedelta(right_ms)
+    return '%s ~ %s' % (ltd, rtd)

@@ -88,10 +88,10 @@ def shortcut_dump(app, window, dump):
 
 
 @scheme
-def shortcut_replay_hewed(app, window, replay_hewed):
+def shortcut_play_hewed(app, window, play_hewed):
     k = QKeySequence('R')
     s = QShortcut(k, window)
-    s.activated.connect(replay_hewed)
+    s.activated.connect(play_hewed)
     return s
 
 

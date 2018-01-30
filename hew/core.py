@@ -13,6 +13,11 @@ scheme = Scheme()
 
 
 @scheme
+def title(source_path):
+    return os.path.basename(source_path)
+
+
+@scheme
 def audio(source_path):
     return AudioFileClip(source_path)
 
