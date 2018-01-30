@@ -76,6 +76,14 @@ def shortcut_adjust(app, window, mark, adjust):
 
 
 @scheme
+def shortcut_hew(app, window, hew):
+    k = QKeySequence('C')
+    s = QShortcut(k, window)
+    s.activated.connect(hew)
+    return s
+
+
+@scheme
 def shortcut_dump(app, window, dump):
     soundonly_k = QKeySequence('D')
     soundonly_s = QShortcut(soundonly_k, window)

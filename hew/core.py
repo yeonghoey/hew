@@ -18,11 +18,6 @@ def title(source_path):
 
 
 @scheme
-def audio(source_path):
-    return AudioFileClip(source_path)
-
-
-@scheme
 def video(source_path):
     _, ext = os.path.splitext(source_path)
 
@@ -33,6 +28,11 @@ def video(source_path):
         return None
     else:
         return VideoFileClip(source_path)
+
+
+@scheme
+def audio(source_path):
+    return AudioFileClip(source_path)
 
 
 @scheme

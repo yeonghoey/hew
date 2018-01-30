@@ -17,25 +17,25 @@ class Window(DraggingMixin, QWidget):
 
 @scheme
 def window(app, screen, layout, player_view):
-    w = Window()
-    w.setFixedWidth(640)
-    w.setLayout(layout)
-    w.show()
-    w.activateWindow()
-    w.raise_()
+    window = Window()
+    window.setFixedWidth(640)
+    window.setLayout(layout)
+    window.show()
+    window.activateWindow()
+    window.raise_()
 
     # Center window
     if player_view is None:
-        w.move(screen.center() - w.rect().center())
+        window.move(screen.center() - window.rect().center())
     else:
         # x: center based on player_view
         # y: center based on both
         center = screen.center() - player_view.rect().center()
-        cx, cy = center.x(), center.y() - w.height()/2
+        cx, cy = center.x(), center.y() - window.height()/2
         player_view.move(cx, cy)
-        w.move(cx, cy + player_view.height())
+        window.move(cx, cy + player_view.height())
 
-    return w
+    return window
 
 
 @scheme
@@ -43,20 +43,20 @@ def player_view(app, player_default_size):
     if player_default_size is None:
         return None
 
-    w = Window()
-    w.setFixedSize(*player_default_size)
-    w.show()
-    w.raise_()
-    return w
+    window = Window()
+    window.setFixedSize(*player_default_size)
+    window.show()
+    window.raise_()
+    return window
 
 
 @scheme
 def layout(app, indicator_layout, slider, clipbox):
-    box = QVBoxLayout()
-    box.addLayout(indicator_layout)
-    box.addWidget(slider)
-    box.addWidget(clipbox)
-    return box
+    layout = QVBoxLayout()
+    layout.addLayout(indicator_layout)
+    layout.addWidget(slider)
+    layout.addWidget(clipbox)
+    return layout
 
 
 @scheme
@@ -74,65 +74,66 @@ def indicator_layout(app,
     right.addWidget(action_label, alignment=Qt.AlignLeft)
     right.addWidget(mark_label, alignment=Qt.AlignLeft)
 
-    box = QHBoxLayout()
-    box.addLayout(left)
-    box.addSpacing(font_metrics.width('mm'))
-    box.addLayout(right)
-    return box
+    layout = QHBoxLayout()
+    layout.addLayout(left)
+    layout.addSpacing(font_metrics.width('mm'))
+    layout.addLayout(right)
+    return layout
 
 
 @scheme
 def title_label(app, title):
-    w = QLabel(title)
-    return w
+    label = QLabel(title)
+    return label
 
 
 @scheme
 def time_label(app, font_metrics):
     z = format_timedelta(0)
-    w = QLabel(z)
+    label = QLabel(z)
     width = font_metrics.width(z)
-    w.setFixedWidth(width)
-    return w
+    label.setFixedWidth(width)
+    return label
 
 
 @scheme
 def action_label(app):
-    w = QLabel()
-    return w
+    label = QLabel()
+    return label
 
 
 @scheme
 def mark_label(app, font_metrics):
     z = format_timedelta_range(left_ms=0, right_ms=0)
-    w = QLabel(z)
+    label = QLabel(z)
     width = font_metrics.width(z)
-    w.setFixedWidth(width)
-    return w
+    label.setFixedWidth(width)
+    return label
 
 
 @scheme
 def slider(app, duration, time_label, set_position):
-    s = QSlider(Qt.Horizontal)
-    s.setRange(0, duration)
-    s.setValue(0)
+    slider = QSlider(Qt.Horizontal)
+    slider.setRange(0, duration)
+    slider.setValue(0)
 
-    s.sliderMoved.connect(set_position)
+    slider.sliderMoved.connect(set_position)
 
-    def update_display(ms):
+    def update_time_label(ms):
         time_label.setText(format_timedelta(ms))
 
-    s.valueChanged.connect(update_display)
+    slider.valueChanged.connect(update_time_label)
 
-    return s
+    return slider
 
 
 @scheme
 def clipbox(app, font_metrics):
-    w = QTextEdit()
-    w.setReadOnly(True)
-    w.setFixedHeight(font_metrics.lineSpacing() * 5)
-    return w
+    text = QTextEdit()
+    text.setReadOnly(True)
+    # FIXME: Hard coded 5 lines height, is there a better way?
+    text.setFixedHeight(font_metrics.lineSpacing() * 5)
+    return text
 
 
 @scheme
@@ -141,7 +142,8 @@ def tick(app, window, slider, vlc_main):
         ms = vlc_main.get_time()
         slider.setValue(ms)
 
-    t = QTimer(window)
-    t.setInterval(200)
-    t.timeout.connect(f)
-    t.start()
+    timer = QTimer(window)
+    timer.setInterval(200)
+    timer.timeout.connect(f)
+    timer.start()
+    return timer

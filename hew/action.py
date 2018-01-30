@@ -118,6 +118,8 @@ def play_hewed(vlc_sub, state, pause, show_action):
         right = state['right']
         if not path:
             return
+
+        pause()
         vlc_sub.set_mrl(path)
         vlc_sub.play()
 

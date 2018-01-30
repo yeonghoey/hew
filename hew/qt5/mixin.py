@@ -1,4 +1,5 @@
 class DraggingMixin:
+
     def mousePressEvent(self, event):
         super().mousePressEvent(event)
         self._dragging_x = event.x()
