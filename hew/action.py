@@ -1,7 +1,9 @@
 from datetime import datetime
 import os
 
-from hew.util import Scheme
+import pyperclip
+
+from hew.util import format_timedelta, Scheme
 
 
 scheme = Scheme()
@@ -27,36 +29,50 @@ def toggle(vlc_main, vlc_sub, play, pause):
 
 
 @scheme
-def seek(vlc_main, clamp):
-    def f(ms):
-        t = vlc_main.get_time() + ms
-        vlc_main.set_time(clamp(t))
-    return f
-
-
-@scheme
-def play(vlc_main):
+def play(vlc_main, show_action):
     def f():
         vlc_main.play()
+        show_action('play')
+
     return f
 
 
 @scheme
-def reload_and_play(vlc_main, source_path):
-    def f():
-        ms = vlc_main.get_time()
-        vlc_main.set_mrl(source_path)
-        vlc_main.play()
-        vlc_main.set_time(ms)
-    return f
-
-
-@scheme
-def pause(vlc_main):
+def pause(vlc_main, show_action):
     def f():
         # NOTE: vlc_main.pause() acts like toggle,
         # but does not act consistently.
         vlc_main.set_pause(1)
+        show_action('pause')
+    return f
+
+
+@scheme
+def seek(vlc_main, clamp, show_action):
+    def f(ms):
+        t = vlc_main.get_time() + ms
+        vlc_main.set_time(clamp(t))
+        show_action('%+ds' % (ms/1000))
+    return f
+
+
+@scheme
+def mark(vlc_main, state, show_action):
+    def f(side):
+        assert side == 'left' or side == 'right'
+        state[side] = vlc_main.get_time()
+        td = format_timedelta(state[side])
+        show_action('mark (%s): %s' % (side, td))
+    return f
+
+
+@scheme
+def adjust(state, clamp, show_action):
+    def f(side, ms):
+        assert side == 'left' or side == 'right'
+        t = state[side] + ms
+        state[side] = clamp(t)
+        show_action('adjust (%s): %+dms' % (side, ms))
     return f
 
 
@@ -66,7 +82,8 @@ def hew(vlc_main,
         anki_media,
         audio,
         state,
-        pause):
+        pause,
+        show_action):
 
     def f():
         left = state['left']
@@ -88,34 +105,21 @@ def hew(vlc_main,
         # Seek to the right end
         vlc_main.set_time(right)
 
+        hewed_duration = format_timedelta(right - left)
+        show_action('hew: %s (%s)' % (filename, hewed_duration))
+
     return f
 
 
 @scheme
-def replay_hewed(vlc_sub, state, pause):
+def replay_hewed(vlc_sub, state, pause, show_action):
     def f():
         path = state['last_hewed_path']
         if not path:
             return
         vlc_sub.set_mrl(path)
         vlc_sub.play()
-    return f
-
-
-@scheme
-def mark(vlc_main, state):
-    def f(side):
-        assert side == 'left' or side == 'right'
-        state[side] = vlc_main.get_time()
-    return f
-
-
-@scheme
-def adjust(state, clamp):
-    def f(side, ms):
-        assert side == 'left' or side == 'right'
-        t = state[side] + ms
-        state[side] = clamp(t)
+        show_action('replay: %s' % os.path.basename(path))
     return f
 
 
@@ -125,7 +129,8 @@ def dump(anki_media,
          use_srt,
          extract_subtitles,
          recognize_hewed,
-         clip):
+         clip,
+         show_action):
 
     def f(do_transcript):
         path = state['last_hewed_path']
@@ -136,8 +141,8 @@ def dump(anki_media,
         right = state['right']
 
         filename = os.path.relpath(path, anki_media)
-        sound_str = '[sound:%s]' % filename
 
+        sound_str = '[sound:%s]' % filename
         if do_transcript:
             transcript = (extract_subtitles(left, right) if use_srt else
                           recognize_hewed(path))
@@ -145,7 +150,26 @@ def dump(anki_media,
             clip(text)
         else:
             clip(sound_str)
+        show_action('dump: %s' % filename)
 
+    return f
+
+
+@scheme
+def clip():
+    def f(s):
+        pyperclip.copy(s)
+    return f
+
+
+@scheme
+def reload_(vlc_main, source_path, show_action):
+    def f():
+        ms = vlc_main.get_time()
+        vlc_main.set_mrl(source_path)
+        vlc_main.play()
+        vlc_main.set_time(ms)
+        show_action('reload')
     return f
 
 
@@ -153,4 +177,11 @@ def dump(anki_media,
 def set_position(vlc_main):
     def f(ms):
         vlc_main.set_time(ms)
+    return f
+
+
+@scheme
+def show_action(action_label):
+    def f(s):
+        action_label.setText(s)
     return f

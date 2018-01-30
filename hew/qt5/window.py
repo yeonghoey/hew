@@ -47,38 +47,45 @@ def player_view(app, player_default_size):
 
 
 @scheme
-def layout(app, player_layout):
+def layout(app, action_label, player_layout):
     box = QVBoxLayout()
+    box.addWidget(action_label)
     box.addLayout(player_layout)
     return box
 
 
 @scheme
-def player_layout(app, slider, indicator):
+def action_label(app):
+    w = QLabel()
+    return w
+
+
+@scheme
+def player_layout(app, slider, time_label):
     box = QHBoxLayout()
     box.addWidget(slider)
-    box.addWidget(indicator)
+    box.addWidget(time_label)
     return box
 
 
 @scheme
-def slider(app, duration, indicator, set_position):
+def slider(app, duration, time_label, set_position):
     s = QSlider(Qt.Horizontal)
     s.setRange(0, duration)
     s.setValue(0)
 
     s.sliderMoved.connect(set_position)
 
-    def update_indicator(ms):
-        indicator.setText(format_timedelta(ms))
+    def update_display(ms):
+        time_label.setText(format_timedelta(ms))
 
-    s.valueChanged.connect(update_indicator)
+    s.valueChanged.connect(update_display)
 
     return s
 
 
 @scheme
-def indicator(app, str_width):
+def time_label(app, str_width):
     z = format_timedelta(0)
     w = QLabel(z)
     width = str_width(z)

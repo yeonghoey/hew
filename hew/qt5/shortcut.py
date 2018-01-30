@@ -96,8 +96,8 @@ def shortcut_replay_hewed(app, window, replay_hewed):
 
 
 @scheme
-def shortcut_reload_and_play(app, window, reload_and_play):
+def shortcut_reload(app, window, reload_):
     k = QKeySequence('Shift+R')
     s = QShortcut(k, window)
-    s.activated.connect(reload_and_play)
+    s.activated.connect(reload_)
     return s

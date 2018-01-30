@@ -2,7 +2,6 @@ import os
 import sys
 import tempfile
 
-import pyperclip
 import pysrt
 from moviepy.editor import AudioFileClip, VideoFileClip
 import speech_recognition as sr
@@ -57,13 +56,6 @@ def duration(audio):
 def clamp(duration):
     def f(ms):
         return min(max(ms, 0), duration)
-    return f
-
-
-@scheme
-def clip():
-    def f(s):
-        pyperclip.copy(s)
     return f
 
 
