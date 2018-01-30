@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QSlider, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QSlider, QHBoxLayout, QVBoxLayout, QWidget, QLabel
 
 from hew.qt5.mixin import DraggingMixin
-from hew.util import Scheme
+from hew.util import format_timedelta, Scheme
 
 
 scheme = Scheme()
@@ -15,26 +15,27 @@ class Window(DraggingMixin, QWidget):
 
 
 @scheme
-def window(app, layout, screen, player):
+def window(app, screen, layout, player_view):
     w = Window()
+    w.setFixedWidth(640)
     w.setLayout(layout)
     w.show()
     w.activateWindow()
     w.raise_()
 
     # Center window
-    if player is None:
+    if player_view is None:
         w.move(screen.center() - w.rect().center())
     else:
-        # Center player, put window below it.
-        player.move(screen.center() - player.rect().center())
-        w.move(player.x(), player.y() + player.height())
+        # Center player_view, put window below it.
+        player_view.move(screen.center() - player_view.rect().center())
+        w.move(player_view.x(), player_view.y() + player_view.height())
 
     return w
 
 
 @scheme
-def player(app, player_default_size):
+def player_view(app, player_default_size):
     if player_default_size is None:
         return None
 
@@ -46,19 +47,43 @@ def player(app, player_default_size):
 
 
 @scheme
-def layout(app, slider):
-    vbox = QVBoxLayout()
-    vbox.addWidget(slider)
-    return vbox
+def layout(app, player_layout):
+    box = QVBoxLayout()
+    box.addLayout(player_layout)
+    return box
 
 
 @scheme
-def slider(app, duration, set_position):
+def player_layout(app, slider, indicator):
+    box = QHBoxLayout()
+    box.addWidget(slider)
+    box.addWidget(indicator)
+    return box
+
+
+@scheme
+def slider(app, duration, indicator, set_position):
     s = QSlider(Qt.Horizontal)
     s.setRange(0, duration)
     s.setValue(0)
+
     s.sliderMoved.connect(set_position)
+
+    def update_indicator(ms):
+        indicator.setText(format_timedelta(ms))
+
+    s.valueChanged.connect(update_indicator)
+
     return s
+
+
+@scheme
+def indicator(app, str_width):
+    z = format_timedelta(0)
+    w = QLabel(z)
+    width = str_width(z)
+    w.setFixedWidth(width)
+    return w
 
 
 @scheme

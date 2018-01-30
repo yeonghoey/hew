@@ -1,5 +1,6 @@
 import sys
 
+from PyQt5.QtGui import QFont, QFontMetrics
 from PyQt5.QtWidgets import QApplication
 
 from hew.qt5 import window, shortcut
@@ -23,3 +24,13 @@ def app():
 @scheme
 def screen(app):
     return app.desktop().screenGeometry()
+
+
+@scheme
+def str_width(app):
+    def f(s):
+        font = QFont()
+        metrics = QFontMetrics(font)
+        return metrics.width(s)
+
+    return f

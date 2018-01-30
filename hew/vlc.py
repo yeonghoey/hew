@@ -13,12 +13,12 @@ def vlc_instance():
 
 
 @scheme
-def vlc_main(vlc_instance, player, source_path):
+def vlc_main(vlc_instance, player_view, source_path):
     p = vlc_instance.media_player_new(source_path)
 
     # NOTE: only support macOS currently
-    if player is not None:
-        nsview = int(player.winId())
+    if player_view is not None:
+        nsview = int(player_view.winId())
         p.set_nsobject(nsview)
     p.play()
     return p

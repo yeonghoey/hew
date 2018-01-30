@@ -38,3 +38,10 @@ def try_run(f, ctx):
         return True
     except KeyError:
         return False
+
+
+def format_timedelta(ms1):
+    s1, ms = divmod(ms1, 1000)
+    m1, s = divmod(s1, 60)
+    h, m = divmod(m1, 60)
+    return '%d:%02d:%02d.%d' % (h, m, s, ms // 100)

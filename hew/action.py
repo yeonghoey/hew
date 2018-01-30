@@ -150,14 +150,6 @@ def dump(anki_media,
 
 
 @scheme
-def resize_player(player, player_default_size):
-    def f(scale=1.):
-        w, h = player_default_size
-        player.setFixedSize(w*scale, h*scale)
-    return f
-
-
-@scheme
 def set_position(vlc_main):
     def f(ms):
         vlc_main.set_time(ms)
