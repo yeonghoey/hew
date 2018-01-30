@@ -10,14 +10,26 @@ scheme = Scheme()
 
 
 class Window(DraggingMixin, QWidget):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, player_view, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.player_view = player_view
         self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
+
+    def moveEvent(self, event):
+        super().moveEvent(event)
+        self.attach_player_view(event.pos())
+
+    def attach_player_view(self, pos):
+        if self.player_view is None:
+            return
+        x = pos.x()
+        y = pos.y()
+        self.player_view.move(x, y - self.player_view.height())
 
 
 @scheme
-def window(app, screen, layout, player_view):
-    window = Window()
+def window(app, player_view, layout, screen):
+    window = Window(player_view)
     window.setFixedWidth(640)
     window.setLayout(layout)
     window.show()
@@ -32,22 +44,22 @@ def window(app, screen, layout, player_view):
         # y: center based on both
         center = screen.center() - player_view.rect().center()
         cx, cy = center.x(), center.y() - window.height()/2
-        player_view.move(cx, cy)
         window.move(cx, cy + player_view.height())
 
     return window
 
 
 @scheme
-def player_view(app, player_default_size):
-    if player_default_size is None:
+def player_view(app, video):
+    if video is None:
         return None
 
-    window = Window()
-    window.setFixedSize(*player_default_size)
-    window.show()
-    window.raise_()
-    return window
+    widget = QWidget()
+    widget.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
+    widget.setFixedSize(*video.size)
+    widget.show()
+    widget.raise_()
+    return widget
 
 
 @scheme
@@ -131,19 +143,20 @@ def slider(app, duration, time_label, set_position):
 def clipbox(app, font_metrics):
     text = QTextEdit()
     text.setReadOnly(True)
-    # FIXME: Hard coded 5 lines height, is there a better way?
-    text.setFixedHeight(font_metrics.lineSpacing() * 5)
+    # FIXME: Hard coded 8 lines for the height,is there a better way?
+    text.setFixedHeight(font_metrics.lineSpacing() * 8)
     return text
 
 
 @scheme
 def tick(app, window, slider, vlc_main):
-    def f():
+
+    def update_slider():
         ms = vlc_main.get_time()
         slider.setValue(ms)
 
     timer = QTimer(window)
     timer.setInterval(200)
-    timer.timeout.connect(f)
+    timer.timeout.connect(update_slider)
     timer.start()
     return timer

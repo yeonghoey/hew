@@ -68,12 +68,13 @@ def mark(vlc_main, state, show_action, update_mark):
 
 
 @scheme
-def adjust(state, clamp, show_action):
+def adjust(state, clamp, show_action, update_mark):
     def f(side, ms):
         assert side == 'left' or side == 'right'
         t = state[side] + ms
         state[side] = clamp(t)
         show_action('%s %+dms' % (side, ms))
+        update_mark(state['left'], state['right'])
     return f
 
 
@@ -132,7 +133,7 @@ def play_hewed(vlc_sub, state, pause, show_action):
 @scheme
 def dump(anki_media,
          state,
-         use_srt,
+         srt,
          extract_subtitles,
          recognize_hewed,
          clip,
@@ -150,7 +151,7 @@ def dump(anki_media,
 
         sound_str = '[sound:%s]' % filename
         if do_transcript:
-            transcript = (extract_subtitles(left, right) if use_srt else
+            transcript = (extract_subtitles(left, right) if srt else
                           recognize_hewed(path))
             text = '%s\n%s' % (sound_str, transcript.strip())
             clip(text)
@@ -199,4 +200,27 @@ def update_mark(mark_label):
     def f(l, r):
         s = format_timedelta_range(l, r)
         mark_label.setText(s)
+    return f
+
+
+@scheme
+def resize(screen, window, player_view, video, state):
+    def f(ratio):
+        if player_view is None:
+            return
+
+        if ratio is None:
+            scale = 1.
+        else:
+            scale = state['scale'] * ratio
+
+        w, h = video.size
+        width = min(max(64, w*scale), screen.width())
+        height = min(max(64, h*scale), screen.height())
+        if w*scale == width and h*scale == height:
+            player_view.setFixedWidth(width)
+            player_view.setFixedHeight(height)
+            window.attach_player_view(window.pos())
+            state['scale'] = scale
+
     return f

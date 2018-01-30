@@ -36,23 +36,6 @@ def audio(source_path):
 
 
 @scheme
-def player_default_size(video, screen):
-    # Determine the base size based on the media
-    # When it's audio, just set zero
-    if video is None:
-        return None
-
-    w, h = video.size
-    # For convenience, do not let the deault size
-    # be larger than half the screen size
-    sw, sh = screen.width(), screen.height()
-    while w > sw*.5 or h > sh*.5:
-        w, h = w*.5, h*.5
-
-    return (w, h)
-
-
-@scheme
 def duration(audio):
     return audio.duration*1000
 
@@ -72,14 +55,15 @@ def state():
         'last_left': 0,
         'last_right': 0,
         'last_hewed_path': '',
+        'scale': 1.,
     }
 
 
 @scheme
-def subtitles(use_srt, srt_path, source_path):
+def subtitles(srt, srt_path, source_path):
     if srt_path is None:
         path = os.path.splitext(source_path)[0] + '.srt'
-    if not use_srt:
+    if not srt:
         return None
     if not os.path.exists(path):
         sys.exit("'%s' does not exist" % path)
@@ -87,10 +71,10 @@ def subtitles(use_srt, srt_path, source_path):
 
 
 @scheme
-def extract_subtitles(subtitles):
-    def f(left, right, padding=1500):
-        ss = subtitles.slice(starts_after=left-padding,
-                             ends_before=right+padding)
+def extract_subtitles(subtitles, srt_padding):
+    def f(left, right):
+        ss = subtitles.slice(starts_after=left - srt_padding,
+                             ends_before=right + srt_padding)
         return ' '.join(s.text for s in ss)
     return f
 
