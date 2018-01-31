@@ -125,3 +125,11 @@ def shortcut_scale(app, window, resize):
         add('Ctrl+0', None),
         add('Ctrl+=', 2.0),
     ]
+
+
+@scheme
+def shortcut_yank(app, window, yank):
+    k = QKeySequence('Y')
+    s = QShortcut(k, window)
+    s.activated.connect(yank)
+    return s

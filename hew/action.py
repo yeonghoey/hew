@@ -171,6 +171,15 @@ def clip(clipbox):
 
 
 @scheme
+def yank(clipbox, show_action):
+    def f():
+        s = clipbox.toPlainText()
+        pyperclip.copy(s)
+        show_action('yank')
+    return f
+
+
+@scheme
 def reload_(vlc_main, source_path, show_action):
     def f():
         ms = vlc_main.get_time()
