@@ -55,7 +55,7 @@ def format_timedelta_range(left_ms, right_ms):
     return '%s ~ %s' % (ltd, rtd)
 
 
-def tempfile_path(ext):
+def temppath(ext):
     fd, path = tempfile.mkstemp(ext)
     os.close(fd)
     return path
