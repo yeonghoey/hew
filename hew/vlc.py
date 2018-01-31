@@ -7,9 +7,11 @@ scheme = Scheme()
 
 
 @scheme
-def vlc_instance():
-    # Disable subtitles because they slow down the player for unknown reason
-    return vlc.Instance('--no-sub-autodetect-file')
+def vlc_instance(no_subtitles):
+    params = []
+    if no_subtitles:
+        params.append('--no-sub-autodetect-file')
+    return vlc.Instance(params)
 
 
 @scheme
