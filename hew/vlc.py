@@ -15,8 +15,8 @@ def vlc_instance(no_subtitles):
 
 
 @scheme
-def vlc_main(vlc_instance, player_view, source_path):
-    p = vlc_instance.media_player_new(source_path)
+def vlc_main(vlc_instance, player_view, main_path):
+    p = vlc_instance.media_player_new(main_path)
 
     # NOTE: only support macOS currently
     if player_view is not None:

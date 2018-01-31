@@ -195,10 +195,10 @@ def take_snapshot(vlc_main, player_view, clip_image, show_action):
 
 
 @scheme
-def reload_(vlc_main, source_path, show_action):
+def reload_(vlc_main, main_path, show_action):
     def f():
         ms = vlc_main.get_time()
-        vlc_main.set_mrl(source_path)
+        vlc_main.set_mrl(main_path)
         vlc_main.play()
         vlc_main.set_time(ms)
         show_action('reload')

@@ -59,3 +59,7 @@ def temppath(ext):
     fd, path = tempfile.mkstemp(ext)
     os.close(fd)
     return path
+
+
+def tempdir():
+    return tempfile.mkdtemp()

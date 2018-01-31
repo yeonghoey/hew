@@ -12,12 +12,14 @@ from hew.util import Scheme
 
 @click.command()
 @click.option('--anki-media', envvar='ANKI_MEDIA')
+@click.option('--convert-wav', is_flag=True)
 @click.option('--no-subtitles', is_flag=True)
 @click.option('--srt', is_flag=True)
 @click.option('--srt-path', type=click.Path(exists=True))
 @click.option('--srt-padding', type=int, default=2000)
 @click.argument('source-path', type=click.Path(exists=True))
 def cli(anki_media,
+        convert_wav,
         no_subtitles,
         srt,
         srt_path,
@@ -31,6 +33,7 @@ def cli(anki_media,
 
     ctx = {
         'anki_media': anki_media,
+        'convert_wav': convert_wav,
         'no_subtitles': no_subtitles,
         'srt': srt,
         'srt_path': srt_path,

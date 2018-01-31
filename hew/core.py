@@ -5,10 +5,23 @@ import pysrt
 from moviepy.editor import AudioFileClip, VideoFileClip
 import speech_recognition as sr
 
-from hew.util import Scheme, temppath
+from hew.util import Scheme, temppath, tempdir
 
 
 scheme = Scheme()
+
+
+@scheme
+def main_path(source_path, convert_wav):
+    if convert_wav:
+        src = AudioFileClip(source_path)
+        filename = os.path.basename(source_path)
+        name, _ = os.path.splitext(filename)
+        wav_path = os.path.join(tempdir(), name + '.wav')
+        src.write_audiofile(wav_path)
+        return wav_path
+    else:
+        return source_path
 
 
 @scheme
@@ -17,8 +30,8 @@ def title(source_path):
 
 
 @scheme
-def video(source_path):
-    _, ext = os.path.splitext(source_path)
+def video(main_path):
+    _, ext = os.path.splitext(main_path)
 
     # FIXME: Hard coded to check whenter or not a file is video,
     # because I failed to figure out a proper way
@@ -26,12 +39,12 @@ def video(source_path):
     if ext in ('.mp3', '.wav'):
         return None
     else:
-        return VideoFileClip(source_path)
+        return VideoFileClip(main_path)
 
 
 @scheme
-def audio(source_path):
-    return AudioFileClip(source_path)
+def audio(main_path):
+    return AudioFileClip(main_path)
 
 
 @scheme
