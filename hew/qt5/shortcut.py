@@ -133,3 +133,11 @@ def shortcut_yank(app, window, yank):
     s = QShortcut(k, window)
     s.activated.connect(yank)
     return s
+
+
+@scheme
+def shortcut_take_snapshot(app, window, take_snapshot):
+    k = QKeySequence('Ctrl+C')
+    s = QShortcut(k, window)
+    s.activated.connect(take_snapshot)
+    return s

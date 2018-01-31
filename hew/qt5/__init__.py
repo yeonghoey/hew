@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtGui import QFont, QFontMetrics
+from PyQt5.QtGui import QFont, QFontMetrics, QPixmap
 from PyQt5.QtWidgets import QApplication
 
 from hew.qt5 import window, shortcut
@@ -24,6 +24,15 @@ def app():
 @scheme
 def screen(app):
     return app.desktop().screenGeometry()
+
+
+@scheme
+def clip_image(app):
+    def f(path):
+        cb = app.clipboard()
+        pm = QPixmap(path)
+        cb.setPixmap(pm)
+    return f
 
 
 @scheme

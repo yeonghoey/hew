@@ -3,7 +3,8 @@ import os
 
 import pyperclip
 
-from hew.util import format_timedelta, format_timedelta_range, Scheme
+from hew.util import (
+    format_timedelta, format_timedelta_range, Scheme, tempfile_path)
 
 
 scheme = Scheme()
@@ -176,6 +177,20 @@ def yank(clipbox, show_action):
         s = clipbox.toPlainText()
         pyperclip.copy(s)
         show_action('yank')
+    return f
+
+
+@scheme
+def take_snapshot(vlc_main, player_view, clip_image, show_action):
+    def f():
+        if player_view is None:
+            return
+        path = tempfile_path('.png')
+        w = player_view.width()
+        h = player_view.height()
+        vlc_main.video_take_snapshot(0, path, w, h)
+        clip_image(path)
+        show_action('yank-screenshot')
     return f
 
 

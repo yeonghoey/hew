@@ -1,4 +1,6 @@
+import os
 from inspect import getargspec
+import tempfile
 
 
 class Scheme:
@@ -51,3 +53,9 @@ def format_timedelta_range(left_ms, right_ms):
     ltd = format_timedelta(left_ms)
     rtd = format_timedelta(right_ms)
     return '%s ~ %s' % (ltd, rtd)
+
+
+def tempfile_path(ext):
+    fd, path = tempfile.mkstemp(ext)
+    os.close(fd)
+    return path

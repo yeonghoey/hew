@@ -1,12 +1,11 @@
 import os
 import sys
-import tempfile
 
 import pysrt
 from moviepy.editor import AudioFileClip, VideoFileClip
 import speech_recognition as sr
 
-from hew.util import Scheme
+from hew.util import Scheme, tempfile_path
 
 
 scheme = Scheme()
@@ -83,7 +82,7 @@ def extract_subtitles(subtitles, srt_padding):
 def recognize_hewn(state):
     def f(path):
         mp3 = AudioFileClip(path)
-        _, wav_path = tempfile.mkstemp('.wav')
+        wav_path = tempfile_path('.wav')
         mp3.write_audiofile(wav_path, verbose=False, progress_bar=False)
 
         r = sr.Recognizer()
