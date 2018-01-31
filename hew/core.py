@@ -36,7 +36,7 @@ def audio(source_path):
 
 @scheme
 def duration(audio):
-    return audio.duration*1000
+    return int(audio.duration*1000)
 
 
 @scheme
