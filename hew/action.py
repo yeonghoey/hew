@@ -190,7 +190,7 @@ def take_snapshot(vlc_main, player_view, clip_image, show_action):
         h = player_view.height()
         vlc_main.video_take_snapshot(0, path, w, h)
         clip_image(path)
-        show_action('yank-screenshot')
+        show_action('take-screenshot')
     return f
 
 
