@@ -86,6 +86,7 @@ def hew(vlc_main,
         audio,
         state,
         pause,
+        dump,
         play_hewn):
 
     def f():
@@ -104,30 +105,12 @@ def hew(vlc_main,
         state['last_left'] = left
         state['last_right'] = right
 
+        dump(do_transcript=False)
         play_hewn()
 
         # Seek to the right end
         vlc_main.set_time(right)
 
-    return f
-
-
-@scheme
-def play_hewn(vlc_sub, state, pause, show_action):
-    def f():
-        path = state['last_hewn_path']
-        left = state['left']
-        right = state['right']
-        if not path:
-            return
-
-        pause()
-        vlc_sub.set_mrl(path)
-        vlc_sub.play()
-
-        filename = os.path.basename(path)
-        hewn_duration = format_timedelta(right - left)
-        show_action('%s (%s)' % (filename, hewn_duration))
     return f
 
 
@@ -160,6 +143,25 @@ def dump(anki_media,
             clip(sound_str)
         show_action('dump')
 
+    return f
+
+
+@scheme
+def play_hewn(vlc_sub, state, pause, show_action):
+    def f():
+        path = state['last_hewn_path']
+        left = state['left']
+        right = state['right']
+        if not path:
+            return
+
+        pause()
+        vlc_sub.set_mrl(path)
+        vlc_sub.play()
+
+        filename = os.path.basename(path)
+        hewn_duration = format_timedelta(right - left)
+        show_action('%s (%s)' % (filename, hewn_duration))
     return f
 
 
