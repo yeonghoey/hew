@@ -84,15 +84,19 @@ def shortcut_hew(app, window, hew):
 
 
 @scheme
-def shortcut_dump(app, window, dump):
-    soundonly_k = QKeySequence('D')
-    soundonly_s = QShortcut(soundonly_k, window)
-    soundonly_s.activated.connect(lambda: dump(do_transcript=False))
+def shortcut_dump_sound(app, window, dump_sound):
+    k = QKeySequence('D')
+    s = QShortcut(k, window)
+    s.activated.connect(dump_sound)
+    return s
 
-    transcript_k = QKeySequence('Shift+D')
-    transcript_s = QShortcut(transcript_k, window)
-    transcript_s.activated.connect(lambda: dump(do_transcript=True))
-    return [soundonly_s, transcript_s]
+
+@scheme
+def shortcut_dump_transcript(app, window, dump_transcript):
+    k = QKeySequence('Shift+D')
+    s = QShortcut(k, window)
+    s.activated.connect(dump_transcript)
+    return s
 
 
 @scheme

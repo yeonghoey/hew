@@ -86,7 +86,7 @@ def hew(vlc_main,
         audio,
         state,
         pause,
-        dump,
+        dump_sound,
         play_hewn):
 
     def f():
@@ -105,7 +105,7 @@ def hew(vlc_main,
         state['last_left'] = left
         state['last_right'] = right
 
-        dump(do_transcript=False)
+        dump_sound()
         play_hewn()
 
         # Seek to the right end
@@ -115,33 +115,47 @@ def hew(vlc_main,
 
 
 @scheme
-def dump(anki_media,
-         state,
-         srt,
-         extract_subtitles,
-         recognize_hewn,
-         clip,
-         show_action):
+def dump_sound(anki_media,
+               state,
+               srt,
+               extract_subtitles,
+               recognize_hewn,
+               clip,
+               show_action):
 
-    def f(do_transcript):
+    def f():
+        path = state['last_hewn_path']
+        if not path:
+            return
+
+        filename = os.path.relpath(path, anki_media)
+        sound_str = '[sound:%s]' % filename
+        clip(sound_str)
+        show_action('dump-sound')
+
+    return f
+
+
+@scheme
+def dump_transcript(anki_media,
+                    state,
+                    srt,
+                    extract_subtitles,
+                    recognize_hewn,
+                    clip,
+                    show_action):
+
+    def f():
         path = state['last_hewn_path']
         if not path:
             return
 
         left = state['left']
         right = state['right']
-
-        filename = os.path.relpath(path, anki_media)
-
-        sound_str = '[sound:%s]' % filename
-        if do_transcript:
-            transcript = (extract_subtitles(left, right) if srt else
-                          recognize_hewn(path))
-            text = '%s\n%s' % (sound_str, transcript.strip())
-            clip(text)
-        else:
-            clip(sound_str)
-        show_action('dump')
+        transcript = (extract_subtitles(left, right) if srt else
+                      recognize_hewn(path))
+        clip(transcript.strip())
+        show_action('dump-transcript')
 
     return f
 
