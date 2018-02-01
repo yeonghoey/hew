@@ -141,3 +141,23 @@ def shortcut_take_snapshot(app, window, take_snapshot):
     s = QShortcut(k, window)
     s.activated.connect(take_snapshot)
     return s
+
+
+@scheme
+def shortcut_shift(app, window):
+    def shift(dx, dy):
+        window.move(window.x() + dx, window.y() + dy)
+
+    def add(key, dx, dy):
+        k = QKeySequence(key)
+        s = QShortcut(k, window)
+        s.activated.connect(lambda: shift(dx, dy))
+        return s
+
+    STEP = 16
+    return [
+        add('Left', -STEP, 0),
+        add('Right', +STEP, 0),
+        add('Up', 0, -STEP),
+        add('Down', 0, +STEP),
+    ]
