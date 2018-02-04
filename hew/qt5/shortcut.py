@@ -165,3 +165,11 @@ def shortcut_shift(app, window):
         add('Up', 0, -STEP),
         add('Down', 0, +STEP),
     ]
+
+
+@scheme
+def shortcut_cycle_subtitle(app, window, cycle_subtitles):
+    k = QKeySequence('Ctrl+S')
+    s = QShortcut(k, window)
+    s.activated.connect(cycle_subtitles)
+    return s

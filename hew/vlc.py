@@ -7,10 +7,8 @@ scheme = Scheme()
 
 
 @scheme
-def vlc_instance(video_sub):
+def vlc_instance():
     params = []
-    if not video_sub:
-        params.append('--no-sub-autodetect-file')
     return vlc.Instance(params)
 
 

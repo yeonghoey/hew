@@ -265,3 +265,28 @@ def resize(screen, window, player_view, video, state):
             state['scale'] = scale
 
     return f
+
+
+@scheme
+def cycle_subtitles(player_view, vlc_main, state, show_action):
+    def f():
+        count = vlc_main.video_get_spu_count()
+        if count <= 0:
+            return
+
+        # video_get_spu() work in a weird way,
+        # so maintain the next spu manually.
+        nxt = state['next_spu']
+        ret = -1
+        while ret != 0:
+            ret = vlc_main.video_set_spu(nxt)
+            if ret == 0:
+                show_action('subtitle %d' % nxt)
+            # How spu number is determined is not documented.
+            # So just based on self experiments:
+            # cycle: -1 <= spu <= get_spu_count()
+            nxt = nxt + 1
+            nxt = nxt if nxt <= count else -1
+        state['next_spu'] = nxt
+
+    return f

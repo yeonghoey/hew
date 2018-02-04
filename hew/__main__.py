@@ -16,14 +16,12 @@ from hew.util import Scheme
 @click.option('--srt', is_flag=True)
 @click.option('--srt-path', type=click.Path(exists=True))
 @click.option('--srt-padding', type=int, default=2000)
-@click.option('--video-sub', is_flag=True)
 @click.argument('source-path', type=click.Path(exists=True))
 def cli(anki_media,
         convert_wav,
         srt,
         srt_path,
         srt_padding,
-        video_sub,
         source_path):
 
     scheme = Scheme(hew.action.scheme,
@@ -37,12 +35,10 @@ def cli(anki_media,
         'srt': srt,
         'srt_path': srt_path,
         'srt_padding': srt_padding,
-        'video_sub': video_sub,
         'source_path': source_path,
     }
 
     scheme.build(ctx)
-
     sys.exit(ctx['app'].exec_())
 
 

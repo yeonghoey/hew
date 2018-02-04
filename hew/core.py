@@ -68,6 +68,7 @@ def state():
         'last_right': 0,
         'last_hewn_path': '',
         'scale': 1.,
+        'next_spu': -1,  # Disabled
     }
 
 
