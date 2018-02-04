@@ -63,8 +63,7 @@ def mark(vlc_main, state, show_action, update_mark):
     def f(side):
         assert side == 'left' or side == 'right'
         state[side] = vlc_main.get_time()
-        td = format_timedelta(state[side])
-        show_action('%s %s' % (side, td))
+        show_action('%s' % side)
         update_mark(state['left'], state['right'])
     return f
 
