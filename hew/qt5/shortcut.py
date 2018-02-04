@@ -118,15 +118,15 @@ def shortcut_reload(app, window, reload_):
 @scheme
 def shortcut_scale(app, window, resize):
 
-    def add(key, ratio):
+    def add(key, ratio, absolute=False):
         k = QKeySequence(key)
         s = QShortcut(k, window)
-        s.activated.connect(lambda: resize(ratio))
+        s.activated.connect(lambda: resize(ratio, absolute))
         return s
 
     return [
         add('Ctrl+-', 0.5),
-        add('Ctrl+0', None),
+        add('Ctrl+0', 1.0, absolute=True),
         add('Ctrl+=', 2.0),
     ]
 

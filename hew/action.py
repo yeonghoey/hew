@@ -11,8 +11,9 @@ scheme = Scheme()
 
 
 @scheme
-def quit_(app):
+def quit_(app, save_settings):
     def f():
+        save_settings()
         app.exit()
     return f
 
@@ -245,14 +246,14 @@ def update_mark(mark_label):
 
 @scheme
 def resize(screen, window, player_view, video, state):
-    def f(ratio):
+    def f(x, absolute=False):
         if player_view is None:
             return
 
-        if ratio is None:
-            scale = 1.
+        if absolute:
+            scale = x
         else:
-            scale = state['scale'] * ratio
+            scale = state['scale'] * x
 
         w, h = video.size
         width = min(max(64, w*scale), screen.width())
