@@ -41,7 +41,11 @@ def source_path(youtube, yt_itag, yt_lang, source):
         caption_path = os.path.join(dir_, caption_name)
         click.secho("Download: '%s'" % caption_path, fg='yellow')
         with open(caption_path, 'w') as f:
-            f.write(caption.generate_srt_captions())
+            try:
+                f.write(caption.generate_srt_captions())
+            except Exception as exc:
+                click.secho("Failed to download srt: '%s'" % str(exc),
+                            fg='red')
 
     return video_path
 

@@ -40,6 +40,8 @@ def try_run(f, ctx):
         kwargs = {k: ctx[k] for k in argnames}
         ctx[f.__name__] = f(**kwargs)
         return True
+    # FIXME: If this KeyError is raised within the scheme function
+    # This will cause an infinate loop.
     except KeyError:
         return False
 
