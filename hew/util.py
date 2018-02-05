@@ -2,6 +2,8 @@ import os
 from inspect import getargspec
 import tempfile
 
+import pytimeparse
+
 
 class Scheme:
     def __init__(self, *schemes):
@@ -53,6 +55,24 @@ def format_timedelta_range(left_ms, right_ms):
     ltd = format_timedelta(left_ms)
     rtd = format_timedelta(right_ms)
     return '%s ~ %s' % (ltd, rtd)
+
+
+def parse_timedelta(s):
+    return (try_seconds(s) or
+            try_pytimeparse(s) or
+            0)
+
+
+def try_seconds(s):
+    try:
+        return float(s)
+    except ValueError:
+        return None
+
+
+def try_pytimeparse(s):
+    # pytimeparse.parse() returns None if it failed to parse.
+    return pytimeparse.parse(s)
 
 
 def temppath(ext):

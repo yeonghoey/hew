@@ -5,7 +5,7 @@ import pysrt
 from moviepy.editor import AudioFileClip, VideoFileClip
 import speech_recognition as sr
 
-from hew.util import Scheme, temppath, tempdir
+from hew.util import parse_timedelta, Scheme, temppath, tempdir
 
 
 scheme = Scheme()
@@ -22,6 +22,14 @@ def main_path(source_path, convert_wav):
         return wav_path
     else:
         return source_path
+
+
+@scheme
+def start_at_ms(start_at):
+    if start_at is None:
+        return 0
+    else:
+        return int(parse_timedelta(start_at) * 1000)
 
 
 @scheme

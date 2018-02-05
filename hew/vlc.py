@@ -13,7 +13,10 @@ def vlc_instance():
 
 
 @scheme
-def vlc_main(vlc_instance, player_view, main_path):
+def vlc_main(vlc_instance,
+             player_view,
+             main_path,
+             start_at_ms):
     p = vlc_instance.media_player_new(main_path)
 
     # NOTE: only support macOS currently
@@ -21,6 +24,7 @@ def vlc_main(vlc_instance, player_view, main_path):
         nsview = int(player_view.winId())
         p.set_nsobject(nsview)
     p.play()
+    p.set_time(start_at_ms)
     return p
 
 

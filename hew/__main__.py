@@ -17,12 +17,14 @@ from hew.util import Scheme
 @click.option('--srt-path', type=click.Path(exists=True))
 @click.option('--srt-padding', type=int, default=2000)
 @click.argument('source-path', type=click.Path(exists=True))
+@click.argument('start-at', default=None, required=False)
 def cli(anki_media,
         convert_wav,
         srt,
         srt_path,
         srt_padding,
-        source_path):
+        source_path,
+        start_at):
 
     scheme = Scheme(hew.action.scheme,
                     hew.core.scheme,
@@ -36,6 +38,7 @@ def cli(anki_media,
         'srt_path': srt_path,
         'srt_padding': srt_padding,
         'source_path': source_path,
+        'start_at': start_at,
     }
 
     scheme.build(ctx)
