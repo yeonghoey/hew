@@ -1,4 +1,5 @@
 import os
+from urllib.parse import parse_qs, urlparse
 
 import click
 from moviepy.editor import AudioFileClip, VideoFileClip
@@ -64,11 +65,18 @@ def main_path(source_path, convert_wav):
 
 
 @scheme
-def start_at_ms(start_at):
+def start_at_ms(start_at, yt, source):
     if start_at is None:
-        return 0
-    else:
-        return int(parse_timedelta(start_at) * 1000)
+        start_at = '0'
+        if yt:
+            qs = urlparse(source).query
+            q = parse_qs(qs)
+            if 't' in q:
+                # 'q' is a dict in form of '{key: list}'
+                start_at = q['t'][0]
+
+    click.secho('Start at: %s' % start_at, fg='yellow')
+    return int(parse_timedelta(start_at) * 1000)
 
 
 @scheme
