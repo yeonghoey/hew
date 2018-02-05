@@ -14,37 +14,33 @@ scheme = Scheme()
 
 
 @scheme
-def youtube_obj(youtube, source):
-    if youtube:
+def youtube(yt, source):
+    if yt:
         return YouTube(source)
     else:
         return None
 
 
 @scheme
-def source_path(youtube_obj,
-                youtube_itag,
-                youtube_lang,
-                source):
-
-    if youtube_obj is None:
+def source_path(youtube, yt_itag, yt_lang, source):
+    if youtube is None:
         return source
 
-    stream = youtube_obj.streams.get_by_itag(youtube_itag)
     dir_ = tempdir()
+    stream = youtube.streams.get_by_itag(yt_itag)
 
     video_name = stream.default_filename
     video_path = os.path.join(dir_, video_name)
 
-    click.echo("Download: '%s'" % (video_name))
+    click.echo('Download: "%s"' % (video_name))
     stream.download(output_path=dir_)
 
-    caption = youtube_obj.captions.get_by_language_code(youtube_lang)
+    caption = youtube.captions.get_by_language_code(yt_lang)
     if caption is not None:
         name, _ = os.path.splitext(video_name)
         caption_name = '%s.srt' % name
         caption_path = os.path.join(dir_, caption_name)
-        click.echo("Download: '%s'" % caption_name)
+        click.echo('Download: "%s"' % caption_name)
         with open(caption_path, 'w') as f:
             f.write(caption.generate_srt_captions())
 
