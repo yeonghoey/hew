@@ -141,7 +141,7 @@ def shortcut_scale(app, window, resize):
 
 @scheme
 def shortcut_take_snapshot(app, window, take_snapshot):
-    k = QKeySequence('Ctrl+S')
+    k = QKeySequence('Ctrl+C')
     s = QShortcut(k, window)
     s.activated.connect(take_snapshot)
     return s
@@ -169,15 +169,23 @@ def shortcut_shift(app, window):
 
 @scheme
 def shortcut_cycle_subtitles(app, window, cycle_subtitles):
-    k = QKeySequence('Ctrl+N')
+    k = QKeySequence('Ctrl+S')
     s = QShortcut(k, window)
     s.activated.connect(cycle_subtitles)
     return s
 
 
 @scheme
-def shortcut_yank_source(app, window, yank_source):
+def shortcut_yank(app, window, yank):
     k = QKeySequence('Y')
+    s = QShortcut(k, window)
+    s.activated.connect(yank)
+    return s
+
+
+@scheme
+def shortcut_yank_source(app, window, yank_source):
+    k = QKeySequence('Shift+Y')
     s = QShortcut(k, window)
     s.activated.connect(yank_source)
     return s
