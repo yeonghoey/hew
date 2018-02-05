@@ -16,7 +16,7 @@ class Scheme:
         name = f.__name__
 
         if name in self.targets:
-            raise RuntimeError('Name conflicts: "%s": (%r, %r)' %
+            raise RuntimeError("Name conflicts: '%s': (%r, %r)" %
                                (name, self.targets[name], f))
         self.targets[name] = f
         return f
@@ -30,7 +30,7 @@ class Scheme:
                 if not ok:
                     next_[name] = f
             if next_ == targets:
-                raise RuntimeError('Cannot resolve dependencies: %r, %r' %
+                raise RuntimeError("Cannot resolve dependencies: %r, %r" %
                                    (targets, ctx.keys()))
 
 
