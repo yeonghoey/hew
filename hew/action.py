@@ -207,15 +207,6 @@ def clip(clipbox):
 
 
 @scheme
-def yank(clipbox, show_action):
-    def f():
-        s = clipbox.toPlainText()
-        pyperclip.copy(s)
-        show_action('yank')
-    return f
-
-
-@scheme
 def take_snapshot(vlc_main, player_view, clip_image, show_action):
     def f():
         if player_view is None:
@@ -307,4 +298,16 @@ def cycle_subtitles(player_view, vlc_main, state, show_action):
             nxt = nxt if nxt <= count else -1
         state['next_spu'] = nxt
 
+    return f
+
+
+@scheme
+def yank_source(youtube, source, source_path, clip, show_action):
+    def f():
+        if youtube is None:
+            clip(source_path)
+        else:
+            atag = '<a href="%s">%s</a>' % (source, youtube.title)
+            clip(atag)
+        show_action('yank-source')
     return f
