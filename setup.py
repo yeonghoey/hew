@@ -41,6 +41,7 @@ setup(
         'pysrt==1.1.1',
         'python-vlc==3.0.101',
         'pytimeparse==1.1.7',
+        'pytube==8.0.2',
         'SpeechRecognition==3.8.1',
     ],
 

@@ -1,14 +1,54 @@
 import os
 import sys
 
-import pysrt
+import click
 from moviepy.editor import AudioFileClip, VideoFileClip
+import pysrt
+from pytube import YouTube
 import speech_recognition as sr
 
 from hew.util import parse_timedelta, Scheme, temppath, tempdir
 
 
 scheme = Scheme()
+
+
+@scheme
+def youtube_obj(youtube, source):
+    if youtube:
+        return YouTube(source)
+    else:
+        return None
+
+
+@scheme
+def source_path(youtube_obj,
+                youtube_itag,
+                youtube_lang,
+                source):
+
+    if youtube_obj is None:
+        return source
+
+    stream = youtube_obj.streams.get_by_itag(youtube_itag)
+    dir_ = tempdir()
+
+    video_name = stream.default_filename
+    video_path = os.path.join(dir_, video_name)
+
+    click.echo("Download: '%s'" % (video_name))
+    stream.download(output_path=dir_)
+
+    caption = youtube_obj.captions.get_by_language_code(youtube_lang)
+    if caption is not None:
+        name, _ = os.path.splitext(video_name)
+        caption_name = '%s.srt' % name
+        caption_path = os.path.join(dir_, caption_name)
+        click.echo("Download: '%s'" % caption_name)
+        with open(caption_path, 'w') as f:
+            f.write(caption.generate_srt_captions())
+
+    return video_path
 
 
 @scheme
