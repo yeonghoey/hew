@@ -26,13 +26,12 @@ def source_path(youtube, yt_itag, yt_lang, source):
         return source
 
     dir_ = tempdir()
-    click.echo('Download in: "%s"' % (dir_))
     stream = youtube.streams.get_by_itag(yt_itag)
 
     video_name = stream.default_filename
     video_path = os.path.join(dir_, video_name)
 
-    click.echo('Download: "%s"' % (video_name))
+    click.echo("Download: '%s'" % (video_path))
     stream.download(output_path=dir_)
 
     caption = youtube.captions.get_by_language_code(yt_lang)
@@ -40,7 +39,7 @@ def source_path(youtube, yt_itag, yt_lang, source):
         name, _ = os.path.splitext(video_name)
         caption_name = '%s.srt' % name
         caption_path = os.path.join(dir_, caption_name)
-        click.echo('Download: "%s"' % caption_name)
+        click.echo("Download: '%s'" % caption_path)
         with open(caption_path, 'w') as f:
             f.write(caption.generate_srt_captions())
 
@@ -120,7 +119,7 @@ def state():
 def subtitles(source_path):
     path = os.path.splitext(source_path)[0] + '.srt'
     if os.path.exists(path):
-        click.echo('Use srt: "%s"' % os.path.basename(path))
+        click.echo("Load srt: '%s'" % path)
         return pysrt.open(path)
     else:
         return None
