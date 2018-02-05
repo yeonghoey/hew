@@ -92,10 +92,18 @@ def shortcut_dump_sound(app, window, dump_sound):
 
 
 @scheme
-def shortcut_dump_transcript(app, window, dump_transcript):
-    k = QKeySequence('Shift+D')
+def shortcut_dump_srt(app, window, dump_srt):
+    k = QKeySequence('Ctrl+D')
     s = QShortcut(k, window)
-    s.activated.connect(dump_transcript)
+    s.activated.connect(dump_srt)
+    return s
+
+
+@scheme
+def shortcut_dump_recognized(app, window, dump_recognized):
+    k = QKeySequence('Ctrl+Shift+D')
+    s = QShortcut(k, window)
+    s.activated.connect(dump_recognized)
     return s
 
 
@@ -141,7 +149,7 @@ def shortcut_yank(app, window, yank):
 
 @scheme
 def shortcut_take_snapshot(app, window, take_snapshot):
-    k = QKeySequence('Ctrl+C')
+    k = QKeySequence('Ctrl+S')
     s = QShortcut(k, window)
     s.activated.connect(take_snapshot)
     return s
@@ -168,8 +176,8 @@ def shortcut_shift(app, window):
 
 
 @scheme
-def shortcut_cycle_subtitle(app, window, cycle_subtitles):
-    k = QKeySequence('Ctrl+S')
+def shortcut_cycle_subtitles(app, window, cycle_subtitles):
+    k = QKeySequence('Ctrl+N')
     s = QShortcut(k, window)
     s.activated.connect(cycle_subtitles)
     return s

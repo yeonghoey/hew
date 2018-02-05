@@ -117,9 +117,6 @@ def hew(vlc_main,
 @scheme
 def dump_sound(anki_media,
                state,
-               srt,
-               extract_subtitles,
-               recognize_hewn,
                clip,
                show_action):
 
@@ -137,10 +134,36 @@ def dump_sound(anki_media,
 
 
 @scheme
-def dump_transcript(anki_media,
+def dump_srt(anki_media,
+             state,
+             subtitles,
+             srt_padding,
+             clip,
+             show_action):
+
+    def f():
+        if not subtitles:
+            return
+
+        path = state['last_hewn_path']
+
+        if not path:
+            return
+
+        left = state['left']
+        right = state['right']
+        ss = subtitles.slice(starts_after=left - srt_padding,
+                             ends_before=right + srt_padding)
+        transcript = ' '.join(s.text for s in ss)
+        clip(transcript.strip())
+        show_action('dump-srt')
+
+    return f
+
+
+@scheme
+def dump_recognized(anki_media,
                     state,
-                    srt,
-                    extract_subtitles,
                     recognize_hewn,
                     clip,
                     show_action):
@@ -150,13 +173,9 @@ def dump_transcript(anki_media,
         if not path:
             return
 
-        left = state['left']
-        right = state['right']
-        transcript = (extract_subtitles(left, right) if srt else
-                      recognize_hewn(path))
+        transcript = recognize_hewn(path)
         clip(transcript.strip())
-        show_action('dump-transcript')
-
+        show_action('dump-recognized')
     return f
 
 
@@ -280,7 +299,7 @@ def cycle_subtitles(player_view, vlc_main, state, show_action):
         while ret != 0:
             ret = vlc_main.video_set_spu(nxt)
             if ret == 0:
-                show_action('subtitle %d' % nxt)
+                show_action('subtitles %d' % nxt)
             # How spu number is determined is not documented.
             # So just based on self experiments:
             # cycle: -1 <= spu <= get_spu_count()

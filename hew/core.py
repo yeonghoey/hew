@@ -1,5 +1,4 @@
 import os
-import sys
 
 import click
 from moviepy.editor import AudioFileClip, VideoFileClip
@@ -27,6 +26,7 @@ def source_path(youtube, yt_itag, yt_lang, source):
         return source
 
     dir_ = tempdir()
+    click.echo('Download in: "%s"' % (dir_))
     stream = youtube.streams.get_by_itag(yt_itag)
 
     video_name = stream.default_filename
@@ -117,23 +117,13 @@ def state():
 
 
 @scheme
-def subtitles(srt, srt_path, source_path):
-    if srt_path is None:
-        path = os.path.splitext(source_path)[0] + '.srt'
-    if not srt:
+def subtitles(source_path):
+    path = os.path.splitext(source_path)[0] + '.srt'
+    if os.path.exists(path):
+        click.echo('Use srt: "%s"' % os.path.basename(path))
+        return pysrt.open(path)
+    else:
         return None
-    if not os.path.exists(path):
-        sys.exit("'%s' does not exist" % path)
-    return pysrt.open(path)
-
-
-@scheme
-def extract_subtitles(subtitles, srt_padding):
-    def f(left, right):
-        ss = subtitles.slice(starts_after=left - srt_padding,
-                             ends_before=right + srt_padding)
-        return ' '.join(s.text for s in ss)
-    return f
 
 
 @scheme
@@ -148,6 +138,7 @@ def recognize_hewn(state):
             audio = r.record(source)
             try:
                 return r.recognize_google_cloud(audio)
-            except (sr.RequestError, sr.UnknownValueError) as exc:
-                return str(exc)
+            except Exception as exc:
+                click.echo(str(exc))
+                return ''
     return f
