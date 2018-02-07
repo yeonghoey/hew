@@ -4,7 +4,7 @@ import os
 import pyperclip
 
 from hew.util import (
-    format_timedelta, format_timedelta_range, Scheme, temppath)
+    format_timedelta, format_timedelta_range, Scheme, tempfile_path)
 
 
 scheme = Scheme()
@@ -207,11 +207,16 @@ def clip(clipbox):
 
 
 @scheme
-def take_snapshot(vlc_main, player_view, clip_image, show_action):
+def take_snapshot(vlc_main,
+                  player_view,
+                  snapshot_dir,
+                  clip_image,
+                  show_action):
+
     def f():
         if player_view is None:
             return
-        path = temppath('.png')
+        path = tempfile_path('.png', snapshot_dir)
         w = player_view.width()
         h = player_view.height()
         vlc_main.video_take_snapshot(0, path, w, h)

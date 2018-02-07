@@ -77,11 +77,11 @@ def try_pytimeparse(s):
     return pytimeparse.parse(s)
 
 
-def temppath(ext):
-    fd, path = tempfile.mkstemp(ext)
+def tempfile_path(ext, dir=None):
+    fd, path = tempfile.mkstemp(ext, dir=dir)
     os.close(fd)
     return path
 
 
-def tempdir():
+def tempdir_path():
     return tempfile.mkdtemp()

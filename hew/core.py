@@ -7,7 +7,7 @@ import pysrt
 from pytube import YouTube
 import speech_recognition as sr
 
-from hew.util import parse_timedelta, Scheme, temppath, tempdir
+from hew.util import parse_timedelta, Scheme, tempfile_path, tempdir_path
 
 
 scheme = Scheme()
@@ -26,7 +26,7 @@ def source_path(youtube, yt_itag, yt_lang, source):
     if youtube is None:
         return source
 
-    dir_ = tempdir()
+    dir_ = tempdir_path()
     stream = youtube.streams.get_by_itag(yt_itag)
 
     video_name = stream.default_filename
@@ -57,7 +57,7 @@ def main_path(source_path, convert_wav):
         src = AudioFileClip(source_path)
         filename = os.path.basename(source_path)
         name, _ = os.path.splitext(filename)
-        wav_path = os.path.join(tempdir(), name + '.wav')
+        wav_path = os.path.join(tempdir_path(), name + '.wav')
         src.write_audiofile(wav_path)
         return wav_path
     else:
@@ -141,7 +141,7 @@ def subtitles(source_path):
 def recognize_hewn(state):
     def f(path):
         mp3 = AudioFileClip(path)
-        wav_path = temppath('.wav')
+        wav_path = tempfile_path('.wav')
         mp3.write_audiofile(wav_path, verbose=False, progress_bar=False)
 
         r = sr.Recognizer()
