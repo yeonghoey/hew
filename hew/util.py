@@ -1,5 +1,6 @@
-import os
 from inspect import getargspec
+import os
+import re
 import tempfile
 
 import pytimeparse
@@ -75,6 +76,11 @@ def try_seconds(s):
 def try_pytimeparse(s):
     # pytimeparse.parse() returns None if it failed to parse.
     return pytimeparse.parse(s)
+
+
+def remove_tags(s):
+    # Just blindly remove all tags
+    return re.sub(r'<[^>]*>', '', s)
 
 
 def tempfile_path(ext, dir=None):
