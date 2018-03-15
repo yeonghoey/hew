@@ -79,7 +79,15 @@ def shortcut_adjust(app, window, mark, adjust):
 def shortcut_hew(app, window, hew):
     k = QKeySequence('C')
     s = QShortcut(k, window)
-    s.activated.connect(hew)
+    s.activated.connect(lambda: hew(try_video=False))
+    return s
+
+
+@scheme
+def shortcut_hew_video(app, window, hew):
+    k = QKeySequence('Shift+C')
+    s = QShortcut(k, window)
+    s.activated.connect(lambda: hew(try_video=True))
     return s
 
 
