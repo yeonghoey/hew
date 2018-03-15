@@ -83,6 +83,8 @@ def adjust(state, clamp, show_action, update_mark):
 def hew(vlc_main,
         vlc_sub,
         anki_media,
+        hew_audio_only,
+        video,
         audio,
         state,
         pause,
@@ -96,11 +98,20 @@ def hew(vlc_main,
             return
 
         pause()
-        hewn = audio.subclip(left/1000., right/1000.)
+
         now = datetime.now().strftime('%Y%m%d-%H%M%S')
-        filename = now + '.mp3'
-        filepath = os.path.join(anki_media, filename)
-        hewn.write_audiofile(filepath, verbose=False, progress_bar=False)
+
+        if hew_audio_only or video is None:
+            hewn = audio.subclip(left/1000., right/1000.)
+            filename = now + '.mp3'
+            filepath = os.path.join(anki_media, filename)
+            hewn.write_audiofile(filepath, verbose=False, progress_bar=False)
+        else:
+            hewn = video.subclip(left/1000., right/1000.)
+            filename = now + '.mp4'
+            filepath = os.path.join(anki_media, filename)
+            hewn.write_videofile(filepath, verbose=False, progress_bar=False)
+
         state['last_hewn_path'] = filepath
         state['last_left'] = left
         state['last_right'] = right

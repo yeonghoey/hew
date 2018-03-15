@@ -20,6 +20,7 @@ DIR = click.Path(exists=True, file_okay=False, dir_okay=True)
 @click.option('--yt-lang', default='en', help='for caption, such as "en"')
 @click.option('--convert-wav', is_flag=True)
 @click.option('--snapshot-dir', type=DIR)
+@click.option('--hew-audio-only', is_flag=True)
 @click.option('--srt-padding', type=int, default=2000)
 @click.option('--vlc-quiet/--vlc-no-quiet', default=True)
 @click.argument('source')
@@ -30,6 +31,7 @@ def cli(anki_media,
         yt_lang,
         convert_wav,
         snapshot_dir,
+        hew_audio_only,
         srt_padding,
         vlc_quiet,
         source,
@@ -47,6 +49,7 @@ def cli(anki_media,
         'yt_lang': yt_lang,
         'convert_wav': convert_wav,
         'snapshot_dir': snapshot_dir,
+        'hew_audio_only': hew_audio_only,
         'srt_padding': srt_padding,
         'vlc_quiet': vlc_quiet,
         'source': source,
