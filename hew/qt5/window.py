@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import (
-    QSlider, QHBoxLayout, QVBoxLayout, QWidget, QLabel, QTextEdit)
+    QSlider, QHBoxLayout, QVBoxLayout, QWidget, QLabel, QPlainTextEdit)
 
 from hew.qt5.mixin import DraggingMixin
 from hew.util import format_timedelta, format_timedelta_range, Scheme
@@ -141,7 +141,7 @@ def slider(app, duration, time_label, set_position):
 
 @scheme
 def clipbox(app, font_metrics):
-    text = QTextEdit()
+    text = QPlainTextEdit()
     text.setReadOnly(True)
     # FIXME: Hard coded 8 lines for the height,is there a better way?
     text.setFixedHeight(font_metrics.lineSpacing() * 8)

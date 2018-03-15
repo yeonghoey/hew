@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+import textwrap
 
 import pyperclip
 
@@ -89,6 +90,7 @@ def hew(vlc_main,
         audio,
         state,
         pause,
+        dump_video,
         dump_sound,
         play_hewn):
 
@@ -106,25 +108,27 @@ def hew(vlc_main,
             hewn = video.subclip(left/1000., right/1000.)
             filename = now + '.mp4'
             filepath = os.path.join(anki_media, filename)
-            ffmpeg_params = [
-                '-vf',
-                'scale=%s:%s' % (player_view.width(), player_view.height())
-            ]
+
+            w, h = player_view.width(), player_view.height()
+            ffmpeg_params = ['-vf', 'scale=%s:%s' % (w, h)]
+            # Codecs chosen for HTML5
             hewn.write_videofile(filepath,
+                                 codec='libx264',
+                                 audio_codec='aac',
                                  ffmpeg_params=ffmpeg_params,
                                  verbose=False,
                                  progress_bar=False)
+            dump_video(filename)
         else:
             hewn = audio.subclip(left/1000., right/1000.)
             filename = now + '.mp3'
             filepath = os.path.join(anki_media, filename)
             hewn.write_audiofile(filepath, verbose=False, progress_bar=False)
+            dump_sound(filename)
 
         state['last_hewn_path'] = filepath
         state['last_left'] = left
         state['last_right'] = right
-
-        dump_sound()
         play_hewn()
 
         # Seek to the right end
@@ -134,17 +138,26 @@ def hew(vlc_main,
 
 
 @scheme
-def dump_sound(anki_media,
-               state,
-               clip,
-               show_action):
+def dump_video(clip, show_action):
+    def f(filename):
+        video_html = textwrap.dedent('''\
+          <div>
+            <video autoplay controls>
+                <source src="{filename}" type="video/mp4">
+            </video>
+            <!-- Mark the file using in Anki -->
+            <img src="{filename}" />
+          </div>
+        ''').format(filename=filename)
+        clip(video_html)
+        show_action('dump-video')
 
-    def f():
-        path = state['last_hewn_path']
-        if not path:
-            return
+    return f
 
-        filename = os.path.relpath(path, anki_media)
+
+@scheme
+def dump_sound(clip, show_action):
+    def f(filename):
         sound_str = '[sound:%s]' % filename
         clip(sound_str)
         show_action('dump-sound')
@@ -221,7 +234,7 @@ def play_hewn(vlc_sub, state, pause, show_action):
 def clip(clipbox):
     def f(s):
         pyperclip.copy(s)
-        clipbox.setText(s)
+        clipbox.setPlainText(s)
     return f
 
 
