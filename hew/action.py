@@ -84,6 +84,7 @@ def adjust(state, clamp, show_action, update_mark):
 def hew(vlc_main,
         vlc_sub,
         anki_media,
+        player_view,
         video,
         audio,
         state,
@@ -105,7 +106,14 @@ def hew(vlc_main,
             hewn = video.subclip(left/1000., right/1000.)
             filename = now + '.mp4'
             filepath = os.path.join(anki_media, filename)
-            hewn.write_videofile(filepath, verbose=False, progress_bar=False)
+            ffmpeg_params = [
+                '-vf',
+                'scale=%s:%s' % (player_view.width(), player_view.height())
+            ]
+            hewn.write_videofile(filepath,
+                                 ffmpeg_params=ffmpeg_params,
+                                 verbose=False,
+                                 progress_bar=False)
         else:
             hewn = audio.subclip(left/1000., right/1000.)
             filename = now + '.mp3'
