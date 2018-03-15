@@ -21,6 +21,7 @@ DIR = click.Path(exists=True, file_okay=False, dir_okay=True)
 @click.option('--convert-wav', is_flag=True)
 @click.option('--snapshot-dir', type=DIR)
 @click.option('--srt-padding', type=int, default=2000)
+@click.option('--vlc-quiet/--vlc-no-quiet', default=True)
 @click.argument('source')
 @click.argument('start-at', default=None, required=False)
 def cli(anki_media,
@@ -30,6 +31,7 @@ def cli(anki_media,
         convert_wav,
         snapshot_dir,
         srt_padding,
+        vlc_quiet,
         source,
         start_at):
 
@@ -46,6 +48,7 @@ def cli(anki_media,
         'convert_wav': convert_wav,
         'snapshot_dir': snapshot_dir,
         'srt_padding': srt_padding,
+        'vlc_quiet': vlc_quiet,
         'source': source,
         'start_at': start_at,
     }

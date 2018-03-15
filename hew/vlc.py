@@ -7,8 +7,10 @@ scheme = Scheme()
 
 
 @scheme
-def vlc_instance():
+def vlc_instance(vlc_quiet):
     params = []
+    if vlc_quiet:
+        params.append('--quiet')
     return vlc.Instance(params)
 
 
