@@ -92,16 +92,8 @@ def shortcut_hew_video(app, window, hew):
 
 
 @scheme
-def shortcut_dump_sound(app, window, dump_sound):
-    k = QKeySequence('D')
-    s = QShortcut(k, window)
-    s.activated.connect(dump_sound)
-    return s
-
-
-@scheme
 def shortcut_dump_srt(app, window, dump_srt):
-    k = QKeySequence('Ctrl+D')
+    k = QKeySequence('D')
     s = QShortcut(k, window)
     s.activated.connect(dump_srt)
     return s
@@ -109,7 +101,7 @@ def shortcut_dump_srt(app, window, dump_srt):
 
 @scheme
 def shortcut_dump_recognized(app, window, dump_recognized):
-    k = QKeySequence('Ctrl+Shift+D')
+    k = QKeySequence('Shift+D')
     s = QShortcut(k, window)
     s.activated.connect(dump_recognized)
     return s

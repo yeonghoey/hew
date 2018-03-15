@@ -4,7 +4,8 @@ import os
 import pyperclip
 
 from hew.util import (
-    format_timedelta, format_timedelta_range, Scheme, tempfile_path)
+    format_timedelta, format_timedelta_range, remove_tags, Scheme,
+    tempfile_path)
 
 
 scheme = Scheme()
@@ -164,7 +165,7 @@ def dump_srt(anki_media,
         right = state['right']
         ss = subtitles.slice(starts_after=left - srt_padding,
                              ends_before=right + srt_padding)
-        transcript = ' '.join(s.text for s in ss)
+        transcript = ' '.join(remove_tags(s.text) for s in ss)
         clip(transcript.strip())
         show_action('dump-srt')
 
