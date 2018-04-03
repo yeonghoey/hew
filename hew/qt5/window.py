@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import (
     QSlider, QHBoxLayout, QVBoxLayout, QWidget, QLabel, QPlainTextEdit)
 
-from hew.qt5.mixin import DraggingMixin
+from hew.qt5.mixin import ActivationHandoverMixin, DraggingMixin
 from hew.util import format_timedelta, format_timedelta_range, Scheme
 
 
@@ -40,6 +40,8 @@ def window(app, player_view, layout, screen):
     if player_view is None:
         window.move(screen.center() - window.rect().center())
     else:
+        setattr(player_view, '_activation_target', window)
+
         # x: center based on player_view
         # y: center based on both
         center = screen.center() - player_view.rect().center()
@@ -49,17 +51,21 @@ def window(app, player_view, layout, screen):
     return window
 
 
+class PlayerView(ActivationHandoverMixin, QWidget):
+    pass
+
+
 @scheme
 def player_view(app, video):
     if video is None:
         return None
 
-    widget = QWidget()
-    widget.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
-    widget.setFixedSize(*video.size)
-    widget.show()
-    widget.raise_()
-    return widget
+    player_view = PlayerView()
+    player_view.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
+    player_view.setFixedSize(*video.size)
+    player_view.show()
+    player_view.raise_()
+    return player_view
 
 
 @scheme
