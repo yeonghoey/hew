@@ -64,6 +64,8 @@ def seek(vlc_main, clamp, show_action):
 def mark(vlc_main, state, show_action, update_mark):
     def f(side):
         assert side == 'left' or side == 'right'
+        # NOTE: Ensure that newly marked hewn to be played at start(left).
+        state['last_hewn_side'] = 'left'
         state[side] = vlc_main.get_time()
         show_action('%s' % side)
         update_mark(state['left'], state['right'])
@@ -75,6 +77,9 @@ def adjust(state, clamp, show_action, update_mark):
     def f(side, ms):
         assert side == 'left' or side == 'right'
         t = state[side] + ms
+        # NOTE: Adjusting means that the user cares that side.
+        # So keep this state to play on that side after hewing
+        state['last_hewn_side'] = side
         state[side] = clamp(t)
         show_action('%s %+dms' % (side, ms))
         update_mark(state['left'], state['right'])
@@ -213,8 +218,9 @@ def dump_recognized(anki_media,
 
 @scheme
 def play_hewn(vlc_sub, state, pause, show_action):
-    def f():
+    def f(side=None):
         path = state['last_hewn_path']
+        side = state['last_hewn_side'] if side is None else side
         left = state['left']
         right = state['right']
         if not path:
@@ -224,8 +230,12 @@ def play_hewn(vlc_sub, state, pause, show_action):
         vlc_sub.set_mrl(path)
         vlc_sub.play()
 
+        duration = right - left
+        if side == 'right':
+            vlc_sub.set_time(max(0, duration - 100))
+
         filename = os.path.basename(path)
-        hewn_duration = format_timedelta(right - left)
+        hewn_duration = format_timedelta(duration)
         show_action('%s (%s)' % (filename, hewn_duration))
     return f
 

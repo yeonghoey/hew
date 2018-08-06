@@ -108,16 +108,24 @@ def shortcut_dump_recognized(app, window, dump_recognized):
 
 
 @scheme
-def shortcut_play_hewn(app, window, play_hewn):
+def shortcut_play_hewn_left(app, window, play_hewn):
     k = QKeySequence('R')
     s = QShortcut(k, window)
-    s.activated.connect(play_hewn)
+    s.activated.connect(lambda: play_hewn('left'))
+    return s
+
+
+@scheme
+def shortcut_play_hewn_right(app, window, play_hewn):
+    k = QKeySequence('Shift+R')
+    s = QShortcut(k, window)
+    s.activated.connect(lambda: play_hewn('right'))
     return s
 
 
 @scheme
 def shortcut_reload(app, window, reload_):
-    k = QKeySequence('Shift+R')
+    k = QKeySequence('Ctrl+R')
     s = QShortcut(k, window)
     s.activated.connect(reload_)
     return s
