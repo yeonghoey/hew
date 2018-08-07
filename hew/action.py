@@ -217,7 +217,7 @@ def dump_recognized(anki_media,
 
 
 @scheme
-def play_hewn(vlc_sub, state, pause, show_action):
+def play_hewn(vlc_sub, state, pause, show_action, right_duration):
     def f(side=None):
         path = state['last_hewn_path']
         side = state['last_hewn_side'] if side is None else side
@@ -232,7 +232,7 @@ def play_hewn(vlc_sub, state, pause, show_action):
 
         duration = right - left
         if side == 'right':
-            vlc_sub.set_time(max(0, duration - 100))
+            vlc_sub.set_time(max(0, duration - right_duration))
 
         filename = os.path.basename(path)
         hewn_duration = format_timedelta(duration)
