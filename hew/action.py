@@ -231,8 +231,11 @@ def play_hewn(vlc_sub, state, pause, show_action, right_duration):
         vlc_sub.play()
 
         duration = right - left
-        if side == 'right':
-            vlc_sub.set_time(max(0, duration - right_duration))
+        if side == 'right' and duration != 0:
+            # NOTE: For some reason, set_time() doesn't work properly,
+            # while set_position() works as expected
+            pos = max(0, duration - right_duration) / duration
+            vlc_sub.set_position(pos)
 
         filename = os.path.basename(path)
         hewn_duration = format_timedelta(duration)
