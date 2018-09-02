@@ -95,8 +95,7 @@ def hew(vlc_main,
         audio,
         state,
         pause,
-        dump_video,
-        dump_sound,
+        dump_media,
         play_hewn):
 
     def f(try_video=False):
@@ -123,13 +122,13 @@ def hew(vlc_main,
                                  ffmpeg_params=ffmpeg_params,
                                  verbose=False,
                                  progress_bar=False)
-            dump_video(filename)
+            dump_media(filename)
         else:
             hewn = audio.subclip(left/1000., right/1000.)
             filename = now + '.mp3'
             filepath = os.path.join(anki_media, filename)
             hewn.write_audiofile(filepath, verbose=False, progress_bar=False)
-            dump_sound(filename)
+            dump_media(filename)
 
         state['last_hewn_path'] = filepath
         state['last_left'] = left
@@ -143,25 +142,7 @@ def hew(vlc_main,
 
 
 @scheme
-def dump_video(clip, show_action):
-    def f(filename):
-        video_html = textwrap.dedent('''\
-          <div>
-            <video autoplay controls>
-                <source src="{filename}" type="video/mp4">
-            </video>
-            <!-- Mark the file using in Anki -->
-            <img src="{filename}" />
-          </div>
-        ''').format(filename=filename)
-        clip(video_html)
-        show_action('dump-video')
-
-    return f
-
-
-@scheme
-def dump_sound(clip, show_action):
+def dump_media(clip, show_action):
     def f(filename):
         sound_str = '[sound:%s]' % filename
         clip(sound_str)
