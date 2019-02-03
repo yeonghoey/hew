@@ -91,7 +91,7 @@ def video(main_path):
     # FIXME: Hard coded to check whenter or not a file is video,
     # because I failed to figure out a proper way
     # to differenciate audio files from video files
-    if ext in ('.mp3', '.wav'):
+    if ext in ('.m4a', '.mp3', '.wav'):
         return None
     else:
         return VideoFileClip(main_path)
