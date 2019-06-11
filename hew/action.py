@@ -91,6 +91,7 @@ def hew(vlc_main,
         anki,
         anki_media,
         video_no_sound,
+        video_as_playersize,
         player_view,
         video,
         audio,
@@ -116,8 +117,10 @@ def hew(vlc_main,
             filename = now + '.mp4'
             filepath = os.path.join(dirname, filename)
 
-            w, h = player_view.width(), player_view.height()
-            ffmpeg_params = ['-vf', 'scale=%s:%s' % (w, h)]
+            ffmpeg_params = []
+            if video_as_playersize:
+                w, h = player_view.width(), player_view.height()
+                ffmpeg_params.extend(['-vf', 'scale=%s:%s' % (w, h)])
             # Codecs chosen for HTML5
             hewn.write_videofile(filepath,
                                  codec='libx264',
