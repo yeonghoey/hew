@@ -16,7 +16,11 @@ scheme = Scheme()
 @scheme
 def youtube(yt, source):
     if yt:
-        return YouTube(source)
+        try:
+            return YouTube(source)
+        except Exception as e:
+            raise RuntimeError('Failed to download YouTube Video')
+
     else:
         return None
 

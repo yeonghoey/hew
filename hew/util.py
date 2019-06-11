@@ -31,8 +31,8 @@ class Scheme:
                 if not ok:
                     next_[name] = f
             if next_ == targets:
-                raise RuntimeError("Cannot resolve dependencies: %r, %r" %
-                                   (targets, ctx.keys()))
+                raise RuntimeError("Cannot resolve dependencies: %r" %
+                                   list(targets.keys()))
 
 
 def try_run(f, ctx):

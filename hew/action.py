@@ -1,6 +1,5 @@
 from datetime import datetime
 import os
-import textwrap
 
 import pyperclip
 
@@ -89,7 +88,9 @@ def adjust(state, clamp, show_action, update_mark):
 @scheme
 def hew(vlc_main,
         vlc_sub,
+        anki,
         anki_media,
+        video_no_sound,
         player_view,
         video,
         audio,
@@ -97,6 +98,8 @@ def hew(vlc_main,
         pause,
         dump_media,
         play_hewn):
+
+    dirname = anki_media if anki else '.'
 
     def f(try_video=False):
         left = state['left']
@@ -111,13 +114,14 @@ def hew(vlc_main,
         if try_video and video is not None:
             hewn = video.subclip(left/1000., right/1000.)
             filename = now + '.mp4'
-            filepath = os.path.join(anki_media, filename)
+            filepath = os.path.join(dirname, filename)
 
             w, h = player_view.width(), player_view.height()
             ffmpeg_params = ['-vf', 'scale=%s:%s' % (w, h)]
             # Codecs chosen for HTML5
             hewn.write_videofile(filepath,
                                  codec='libx264',
+                                 audio=not video_no_sound,
                                  audio_codec='aac',
                                  ffmpeg_params=ffmpeg_params,
                                  verbose=False,
@@ -126,7 +130,7 @@ def hew(vlc_main,
         else:
             hewn = audio.subclip(left/1000., right/1000.)
             filename = now + '.mp3'
-            filepath = os.path.join(anki_media, filename)
+            filepath = os.path.join(dirname, filename)
             hewn.write_audiofile(filepath, verbose=False, progress_bar=False)
             dump_media(filename)
 
@@ -152,8 +156,7 @@ def dump_media(clip, show_action):
 
 
 @scheme
-def dump_srt(anki_media,
-             state,
+def dump_srt(state,
              subtitles,
              srt_padding,
              clip,
@@ -180,8 +183,7 @@ def dump_srt(anki_media,
 
 
 @scheme
-def dump_recognized(anki_media,
-                    state,
+def dump_recognized(state,
                     recognize_hewn,
                     clip,
                     show_action):

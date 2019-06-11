@@ -14,7 +14,10 @@ DIR = click.Path(exists=True, file_okay=False, dir_okay=True)
 
 
 @click.command()
+@click.option('--anki', is_flag=True)
 @click.option('--anki-media', type=DIR, envvar='ANKI_MEDIA')
+@click.option('--video-on-rmark', is_flag=True)
+@click.option('--video-no-sound', is_flag=True)
 @click.option('--yt', is_flag=True)
 @click.option('--yt-itag', default=18, type=int, help='18: 360p, 22: 720p,...')
 @click.option('--yt-lang', default='en', help='for caption, such as "en"')
@@ -25,7 +28,10 @@ DIR = click.Path(exists=True, file_okay=False, dir_okay=True)
 @click.option('--vlc-quiet/--vlc-no-quiet', default=True)
 @click.argument('source')
 @click.argument('start-at', default=None, required=False)
-def cli(anki_media,
+def cli(anki,
+        anki_media,
+        video_on_rmark,
+        video_no_sound,
         yt,
         yt_itag,
         yt_lang,
@@ -43,7 +49,10 @@ def cli(anki_media,
                     hew.vlc.scheme)
 
     ctx = {
+        'anki': anki,
         'anki_media': anki_media,
+        'video_on_rmark': video_on_rmark,
+        'video_no_sound': video_no_sound,
         'yt': yt,
         'yt_itag': yt_itag,
         'yt_lang': yt_lang,
