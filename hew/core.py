@@ -107,6 +107,13 @@ def audio(main_path):
 
 
 @scheme
+def try_video(video, mode):
+    if video is None:
+        return False
+    return mode == 'video'
+
+
+@scheme
 def duration(audio):
     return int(audio.duration*1000)
 

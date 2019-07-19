@@ -102,7 +102,7 @@ def hew(vlc_main,
 
     dirname = anki_media if anki else '.'
 
-    def f(try_video=False):
+    def f(try_video):
         left = state['left']
         right = state['right']
         if left >= right:

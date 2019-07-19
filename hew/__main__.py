@@ -16,7 +16,7 @@ DIR = click.Path(exists=True, file_okay=False, dir_okay=True)
 @click.command()
 @click.option('--anki', is_flag=True)
 @click.option('--anki-media', type=DIR, envvar='ANKI_MEDIA')
-@click.option('--video-on-rmark', is_flag=True)
+@click.option('--mode', default='video', type=click.Choice(['video', 'audio']))
 @click.option('--video-no-sound', is_flag=True)
 @click.option('--video-as-playersize', is_flag=True)
 @click.option('--yt', is_flag=True)
@@ -32,7 +32,7 @@ DIR = click.Path(exists=True, file_okay=False, dir_okay=True)
 @click.argument('start-at', default=None, required=False)
 def cli(anki,
         anki_media,
-        video_on_rmark,
+        mode,
         video_no_sound,
         video_as_playersize,
         yt,
@@ -56,10 +56,11 @@ def cli(anki,
         # https://gist.github.com/sidneys/7095afe4da4ae58694d128b1034e01e2
         mapping = {'360p': 18, '720p': 22, '1080p': 37}
         yt_itag = mapping[yt_quality]
+
     ctx = {
         'anki': anki,
         'anki_media': anki_media,
-        'video_on_rmark': video_on_rmark,
+        'mode': mode,
         'video_no_sound': video_no_sound,
         'video_as_playersize': video_as_playersize,
         'yt': yt,

@@ -40,7 +40,7 @@ def shortcut_seek(app, window, seek):
 
 
 @scheme
-def shortcut_mark(app, window, mark, hew, video_on_rmark):
+def shortcut_mark(app, window, mark, hew, try_video):
     left_k = QKeySequence('K')
     left_s = QShortcut(left_k, window)
 
@@ -53,7 +53,7 @@ def shortcut_mark(app, window, mark, hew, video_on_rmark):
 
     def mark_right():
         mark('right')
-        hew(try_video=video_on_rmark)
+        hew(try_video)
     right_s.activated.connect(mark_right)
 
     return (left_s, right_s)
@@ -76,18 +76,18 @@ def shortcut_adjust(app, window, mark, adjust):
 
 
 @scheme
-def shortcut_hew(app, window, hew):
+def shortcut_hew_default(app, window, hew, try_video):
     k = QKeySequence('C')
     s = QShortcut(k, window)
-    s.activated.connect(lambda: hew(try_video=False))
+    s.activated.connect(lambda: hew(try_video))
     return s
 
 
 @scheme
-def shortcut_hew_video(app, window, hew):
+def shortcut_hew_other(app, window, hew, try_video):
     k = QKeySequence('Shift+C')
     s = QShortcut(k, window)
-    s.activated.connect(lambda: hew(try_video=True))
+    s.activated.connect(lambda: hew(not try_video))
     return s
 
 
