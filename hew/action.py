@@ -120,6 +120,8 @@ def hew(vlc_main,
             ffmpeg_params = []
             if not video_no_resize:
                 w, h = player_view.width(), player_view.height()
+                # ffmpeg requires sizes to be even
+                w, h = (w//2)*2, (h//2)*2
                 ffmpeg_params.extend(['-vf', 'scale=%s:%s' % (w, h)])
             # Codecs chosen for HTML5
             hewn.write_videofile(filepath,
