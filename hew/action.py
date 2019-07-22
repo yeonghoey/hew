@@ -91,7 +91,7 @@ def hew(vlc_main,
         anki,
         anki_media,
         video_no_sound,
-        video_as_playersize,
+        video_no_resize,
         player_view,
         video,
         audio,
@@ -118,7 +118,7 @@ def hew(vlc_main,
             filepath = os.path.join(dirname, filename)
 
             ffmpeg_params = []
-            if video_as_playersize:
+            if not video_no_resize:
                 w, h = player_view.width(), player_view.height()
                 ffmpeg_params.extend(['-vf', 'scale=%s:%s' % (w, h)])
             # Codecs chosen for HTML5
