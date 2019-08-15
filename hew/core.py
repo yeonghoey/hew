@@ -79,7 +79,8 @@ def start_at_ms(start_at, yt, source):
                 # 'q' is a dict in form of '{key: list}'
                 start_at = q['t'][0]
 
-    click.secho('Start at: %s' % start_at, fg='yellow')
+    if start_at != '0':
+        click.secho('Start at: %s' % start_at, fg='yellow')
     return int(parse_timedelta(start_at) * 1000)
 
 
