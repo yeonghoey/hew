@@ -28,9 +28,9 @@ class Window(DraggingMixin, QWidget):
 
 
 @scheme
-def window(app, player_view, layout, screen, window_width):
+def window(app, player_view, layout, screen):
     window = Window(player_view)
-    window.setFixedWidth(window_width)
+    window.setFixedWidth(640)
     window.setLayout(layout)
     window.show()
     window.activateWindow()
@@ -51,11 +51,6 @@ def window(app, player_view, layout, screen, window_width):
     return window
 
 
-@scheme
-def window_width():
-    return 640
-
-
 class PlayerView(ActivationHandoverMixin, QWidget):
     pass
 
@@ -74,10 +69,10 @@ def player_view(app, video):
 
 
 @scheme
-def layout(app, indicator_layout, slider, clipbox):
+def layout(app, indicator_layout, slider_layout, clipbox):
     layout = QVBoxLayout()
     layout.addLayout(indicator_layout)
-    layout.addWidget(slider)
+    layout.addLayout(slider_layout)
     layout.addWidget(clipbox)
     return layout
 
@@ -85,22 +80,23 @@ def layout(app, indicator_layout, slider, clipbox):
 @scheme
 def indicator_layout(app,
                      title_label,
-                     time_label,
                      mark_label,
                      action_label,
                      font_metrics):
+    layout = QHBoxLayout()
+    layout.setContentsMargins(5, 0, 5, 0)
+
     left = QVBoxLayout()
     left.addWidget(title_label)
-    left.addWidget(time_label, alignment=Qt.AlignLeft)
+    layout.addLayout(left, stretch=1)
+
+    layout.addSpacing(font_metrics.width('mm'))
 
     right = QVBoxLayout()
     right.addWidget(action_label, alignment=Qt.AlignLeft)
     right.addWidget(mark_label, alignment=Qt.AlignLeft)
+    layout.addLayout(right, stretch=1)
 
-    layout = QHBoxLayout()
-    layout.addLayout(left)
-    layout.addSpacing(font_metrics.width('mm'))
-    layout.addLayout(right)
     return layout
 
 
@@ -111,17 +107,8 @@ def title_label(app, title):
 
 
 @scheme
-def time_label(app, font_metrics):
-    z = format_timedelta(0)
-    label = QLabel(z)
-    width = font_metrics.width(z)
-    label.setFixedWidth(width)
-    return label
-
-
-@scheme
 def action_label(app):
-    label = QLabel()
+    label = QLabel('-')
     return label
 
 
@@ -135,17 +122,53 @@ def mark_label(app, font_metrics):
 
 
 @scheme
-def slider(app, duration, time_label, set_position):
+def slider_layout(app, time_labels_layout, slider):
+    layout = QVBoxLayout()
+    layout.addLayout(time_labels_layout)
+    layout.addWidget(slider)
+    return layout
+
+
+@scheme
+def time_labels_layout(app, current_time_label, duration_time_label):
+    layout = QHBoxLayout()
+    layout.setContentsMargins(5, 0, 5, 0)
+    layout.addWidget(current_time_label)
+    layout.addStretch(1)
+    layout.addWidget(duration_time_label, alignment=Qt.AlignRight)
+    return layout
+
+
+@scheme
+def current_time_label(app, font_metrics):
+    z = format_timedelta(0)
+    label = QLabel(z)
+    width = font_metrics.width(z)
+    label.setFixedWidth(width)
+    return label
+
+
+@scheme
+def duration_time_label(app, font_metrics, duration):
+    z = format_timedelta(duration)
+    label = QLabel(z)
+    width = font_metrics.width(z)
+    label.setFixedWidth(width)
+    return label
+
+
+@scheme
+def slider(app, duration, current_time_label, set_position):
     slider = QSlider(Qt.Horizontal)
     slider.setRange(0, duration)
     slider.setValue(0)
 
     slider.sliderMoved.connect(set_position)
 
-    def update_time_label(ms):
-        time_label.setText(format_timedelta(ms))
+    def update_current_time_label(ms):
+        current_time_label.setText(format_timedelta(ms))
 
-    slider.valueChanged.connect(update_time_label)
+    slider.valueChanged.connect(update_current_time_label)
 
     return slider
 
