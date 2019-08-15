@@ -26,6 +26,7 @@ setup(
     author_email='yeonghoey@gmail.com',
 
     packages=find_packages(),
+    package_data={'hew': ['hew.png']},
 
     entry_points={
         'console_scripts': [

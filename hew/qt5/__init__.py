@@ -1,7 +1,8 @@
+import pkgutil
 import sys
 
 from PyQt5.QtCore import QSettings
-from PyQt5.QtGui import QFont, QFontMetrics, QPixmap
+from PyQt5.QtGui import QFont, QFontMetrics, QPixmap, QIcon, QImage
 from PyQt5.QtWidgets import QApplication
 
 from hew.qt5 import window, shortcut
@@ -19,7 +20,19 @@ def app():
     # So, just pass the first argument(the script path) to QApplication
     # SEE: https://doc.qt.io/qt-5/qapplication.html#QApplication
     argv = sys.argv[:1]
-    return QApplication(argv)
+    a = QApplication(argv)
+
+    # NOTE: This is for future use.
+    # This doesn't replace the display name "Python" to "hew on macOS
+    a.setApplicationName('Hew')
+
+    # Load Icon
+    data = pkgutil.get_data('hew', 'hew.png')
+    image = QImage.fromData(data)
+    pixmap = QPixmap.fromImage(image)
+    icon = QIcon(pixmap)
+    a.setWindowIcon(icon)
+    return a
 
 
 @scheme
