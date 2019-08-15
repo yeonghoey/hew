@@ -38,7 +38,7 @@ setup(
         'google-api-python-client==1.6.4',
         'moviepy==0.2.3.2',
         'pyperclip==1.6.0',
-        'PyQt5==5.10',
+        'PyQt5>=5.10',
         'pysrt==1.1.1',
         'python-vlc==3.0.102',
         'pytimeparse==1.1.7',
