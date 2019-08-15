@@ -28,9 +28,9 @@ class Window(DraggingMixin, QWidget):
 
 
 @scheme
-def window(app, player_view, layout, screen):
+def window(app, player_view, layout, screen, window_width):
     window = Window(player_view)
-    window.setFixedWidth(640)
+    window.setFixedWidth(window_width)
     window.setLayout(layout)
     window.show()
     window.activateWindow()
@@ -49,6 +49,11 @@ def window(app, player_view, layout, screen):
         window.move(cx, cy + player_view.height())
 
     return window
+
+
+@scheme
+def window_width():
+    return 640
 
 
 class PlayerView(ActivationHandoverMixin, QWidget):
