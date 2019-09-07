@@ -37,13 +37,11 @@ class Scheme:
 
 def try_run(f, ctx):
     argnames = getargspec(f)[0]
-    try:
+    if all(k in ctx for k in argnames):
         kwargs = {k: ctx[k] for k in argnames}
         ctx[f.__name__] = f(**kwargs)
         return True
-    # FIXME: If this KeyError is raised within the scheme function
-    # This will cause an infinate loop.
-    except KeyError:
+    else:
         return False
 
 
