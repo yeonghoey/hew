@@ -129,8 +129,7 @@ def hew(vlc_main,
                                  audio=not video_no_sound,
                                  audio_codec='aac',
                                  ffmpeg_params=ffmpeg_params,
-                                 verbose=False,
-                                 progress_bar=False)
+                                 logger=None)
             dump_media(filename)
         else:
             hewn = audio.subclip(left/1000., right/1000.)

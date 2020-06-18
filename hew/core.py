@@ -2,6 +2,7 @@ import os
 from urllib.parse import parse_qs, urlparse
 
 import click
+import moviepy.audio.fx.all as afx
 from moviepy.editor import AudioFileClip, VideoFileClip
 import pysrt
 from pytube import YouTube
@@ -99,12 +100,12 @@ def video(main_path):
     if ext in ('.m4a', '.mp3', '.wav'):
         return None
     else:
-        return VideoFileClip(main_path)
+        return VideoFileClip(main_path).fx(afx.audio_normalize)
 
 
 @scheme
 def audio(main_path):
-    return AudioFileClip(main_path)
+    return AudioFileClip(main_path).fx(afx.audio_normalize)
 
 
 @scheme

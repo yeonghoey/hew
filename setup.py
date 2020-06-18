@@ -37,7 +37,7 @@ setup(
     install_requires=[
         'Click==6.7',
         'google-api-python-client==1.6.4',
-        'moviepy==0.2.3.2',
+        'moviepy==1.0.3',
         'pyperclip==1.6.0',
         'PyQt5==5.10',
         'pysrt==1.1.1',
