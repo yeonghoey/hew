@@ -111,13 +111,6 @@ def audio(main_path):
 
 
 @scheme
-def try_video(video, mode):
-    if video is None:
-        return False
-    return mode == 'video'
-
-
-@scheme
 def duration(audio):
     return int(audio.duration*1000)
 
@@ -140,6 +133,7 @@ def state():
         'last_hewn-side': 'left',
         'scale': 1.,
         'next_spu': -1,  # Disabled
+        'try_video': False,  # Toggle with Tab
     }
 
 

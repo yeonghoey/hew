@@ -103,7 +103,7 @@ def hew(vlc_main,
 
     dirname = anki_media if anki else '.'
 
-    def f(try_video):
+    def f():
         left = state['left']
         right = state['right']
         if left >= right:
@@ -113,7 +113,7 @@ def hew(vlc_main,
 
         now = datetime.now().strftime('%Y%m%d-%H%M%S')
 
-        if try_video and video is not None:
+        if state['try_video'] and video is not None:
             hewn = subclip(video, left, right)
             filename = now + '.mp4'
             filepath = os.path.join(dirname, filename)

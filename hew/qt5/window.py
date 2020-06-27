@@ -81,6 +81,7 @@ def layout(app, indicator_layout, slider_layout, clipbox):
 def indicator_layout(app,
                      title_label,
                      mark_label,
+                     try_video_label,
                      action_label,
                      font_metrics):
     layout = QHBoxLayout()
@@ -92,10 +93,16 @@ def indicator_layout(app,
 
     layout.addSpacing(font_metrics.width('mm'))
 
+    mid = QVBoxLayout()
+    mid.addWidget(action_label, alignment=Qt.AlignLeft)
+    mid.addWidget(mark_label, alignment=Qt.AlignLeft)
+    layout.addLayout(mid, stretch=1)
+
+    layout.addSpacing(font_metrics.width('mm'))
+
     right = QVBoxLayout()
-    right.addWidget(action_label, alignment=Qt.AlignLeft)
-    right.addWidget(mark_label, alignment=Qt.AlignLeft)
-    layout.addLayout(right, stretch=1)
+    right.addWidget(try_video_label)
+    layout.addLayout(right, stretch=0)
 
     return layout
 
@@ -119,6 +126,20 @@ def mark_label(app, font_metrics):
     width = font_metrics.width(z)
     label.setFixedWidth(width)
     return label
+
+
+@scheme
+def try_video_label(app, state, try_video_label_text):
+    t = try_video_label_text(state['try_video'])
+    label = QLabel(t)
+    return label
+
+
+@scheme
+def try_video_label_text():
+    def f(try_video):
+        return 'mp4' if try_video else 'mp3'
+    return f
 
 
 @scheme

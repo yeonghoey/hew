@@ -40,7 +40,7 @@ def shortcut_seek(app, window, seek):
 
 
 @scheme
-def shortcut_mark(app, window, mark, hew, try_video):
+def shortcut_mark(app, window, mark, hew):
     left_k = QKeySequence('K')
     left_s = QShortcut(left_k, window)
 
@@ -53,7 +53,7 @@ def shortcut_mark(app, window, mark, hew, try_video):
 
     def mark_right():
         mark('right')
-        hew(try_video)
+        hew()
     right_s.activated.connect(mark_right)
 
     return (left_s, right_s)
@@ -76,18 +76,24 @@ def shortcut_adjust(app, window, mark, adjust):
 
 
 @scheme
-def shortcut_hew_default(app, window, hew, try_video):
+def shortcut_hew(app, window, hew):
     k = QKeySequence('C')
     s = QShortcut(k, window)
-    s.activated.connect(lambda: hew(try_video))
+    s.activated.connect(lambda: hew())
     return s
 
 
 @scheme
-def shortcut_hew_other(app, window, hew, try_video):
-    k = QKeySequence('Shift+C')
+def shortcut_toggle_try_video(app, window, video, state, try_video_label, try_video_label_text):
+    k = QKeySequence('Tab')
     s = QShortcut(k, window)
-    s.activated.connect(lambda: hew(not try_video))
+
+    def f():
+        try_video = (video is not None) and (not state['try_video'])
+        try_video_label.setText(try_video_label_text(try_video))
+        state['try_video'] = try_video
+
+    s.activated.connect(f)
     return s
 
 
