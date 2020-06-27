@@ -100,12 +100,14 @@ def video(main_path):
     if ext in ('.m4a', '.mp3', '.wav'):
         return None
     else:
-        return VideoFileClip(main_path).fx(afx.audio_normalize)
+        # NOTE: This will be the default option
+        # See https://github.com/Zulko/moviepy/issues/404#issuecomment-650461768
+        return VideoFileClip(main_path, fps_source='fps')
 
 
 @scheme
 def audio(main_path):
-    return AudioFileClip(main_path).fx(afx.audio_normalize)
+    return AudioFileClip(main_path)
 
 
 @scheme

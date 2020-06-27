@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 
+import moviepy.audio.fx.all as afx
 import pyperclip
 
 from hew.util import (
@@ -113,7 +114,7 @@ def hew(vlc_main,
         now = datetime.now().strftime('%Y%m%d-%H%M%S')
 
         if try_video and video is not None:
-            hewn = video.subclip(left/1000., right/1000.)
+            hewn = subclip(video, left, right)
             filename = now + '.mp4'
             filepath = os.path.join(dirname, filename)
 
@@ -128,14 +129,13 @@ def hew(vlc_main,
                                  codec='libx264',
                                  audio=not video_no_sound,
                                  audio_codec='aac',
-                                 ffmpeg_params=ffmpeg_params,
-                                 logger=None)
+                                 ffmpeg_params=ffmpeg_params)
             dump_media(filename)
         else:
-            hewn = audio.subclip(left/1000., right/1000.)
+            hewn = subclip(audio, left, right)
             filename = now + '.mp3'
             filepath = os.path.join(dirname, filename)
-            hewn.write_audiofile(filepath, verbose=False, progress_bar=False)
+            hewn.write_audiofile(filepath)
             dump_media(filename)
 
         state['last_hewn_path'] = filepath
@@ -147,6 +147,14 @@ def hew(vlc_main,
         vlc_main.set_time(right)
 
     return f
+
+
+def subclip(clip, left, right):
+    return (
+        clip.subclip(left/1000., right/1000.)
+            .fx(afx.audio_normalize)
+            .fx(afx.volumex, 0.56) # NOTE: around -5.0 dbFS at max
+    )
 
 
 @scheme
