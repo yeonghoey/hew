@@ -123,7 +123,7 @@ def clamp(duration):
 
 
 @scheme
-def state():
+def state(video):
     return {
         'left': 0,
         'right': 0,
@@ -133,7 +133,7 @@ def state():
         'last_hewn-side': 'left',
         'scale': 1.,
         'next_spu': -1,  # Disabled
-        'try_video': False,  # Toggle with Tab
+        'try_video': video is not None,  # Toggle with Tab
     }
 
 
