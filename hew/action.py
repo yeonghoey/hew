@@ -153,7 +153,7 @@ def subclip(clip, left, right):
     return (
         clip.subclip(left/1000., right/1000.)
             .fx(afx.audio_normalize)
-            .fx(afx.volumex, 0.56) # NOTE: around -5.0 dbFS at max
+            .fx(afx.volumex, 0.63) # NOTE: about -4.0 dbFS at max
     )
 
 
