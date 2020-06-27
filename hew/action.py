@@ -111,7 +111,7 @@ def hew(vlc_main,
 
         pause()
 
-        now = datetime.now().strftime('%Y%m%d-%H%M%S')
+        now = datetime.utcnow().strftime('%Y%m%d-%H%M%S')
 
         if state['try_video'] and video is not None:
             hewn = subclip(video, left, right)
