@@ -43,7 +43,7 @@ setup(
         'pysrt==1.1.1',
         'python-vlc==3.0.102',
         'pytimeparse==1.1.7',
-        'pytube>=9.5.0',
+        'pytube3>=9.5.0',
         'SpeechRecognition==3.8.1',
     ],
 
