@@ -1,12 +1,12 @@
-from datetime import datetime
 import os
+import shutil
 
 import moviepy.audio.fx.all as afx
 import pyperclip
 
 from hew.util import (
     format_timedelta, format_timedelta_range, remove_tags, Scheme,
-    tempfile_path)
+    tempfile_path, sha1of)
 
 
 scheme = Scheme()
@@ -111,13 +111,9 @@ def hew(vlc_main,
 
         pause()
 
-        now = datetime.utcnow().strftime('%Y%m%d-%H%M%S')
-
         if state['try_video'] and video is not None:
             hewn = subclip(video, left, right)
-            filename = now + '.mp4'
-            filepath = os.path.join(dirname, filename)
-
+            temppath = tempfile_path('.mp4')
             ffmpeg_params = []
             if not video_no_resize:
                 w, h = player_view.width(), player_view.height()
@@ -125,17 +121,22 @@ def hew(vlc_main,
                 w, h = (w//2)*2, (h//2)*2
                 ffmpeg_params.extend(['-vf', 'scale=%s:%s' % (w, h)])
             # Codecs chosen for HTML5
-            hewn.write_videofile(filepath,
+            hewn.write_videofile(temppath,
                                  codec='libx264',
                                  audio=not video_no_sound,
                                  audio_codec='aac',
                                  ffmpeg_params=ffmpeg_params)
+            filename = sha1of(temppath) + '.mp4'
+            filepath = os.path.join(dirname, filename)
+            shutil.move(temppath, filepath)
             dump_media(filename)
         else:
             hewn = subclip(audio, left, right)
-            filename = now + '.mp3'
+            temppath = tempfile_path('.mp3')
+            hewn.write_audiofile(temppath)
+            filename = sha1of(temppath) + '.mp3'
             filepath = os.path.join(dirname, filename)
-            hewn.write_audiofile(filepath)
+            shutil.move(temppath, filepath)
             dump_media(filename)
 
         state['last_hewn_path'] = filepath
@@ -153,7 +154,7 @@ def subclip(clip, left, right):
     return (
         clip.subclip(left/1000., right/1000.)
             .fx(afx.audio_normalize)
-            .fx(afx.volumex, 0.63) # NOTE: about -4.0 dbFS at max
+            .fx(afx.volumex, 0.63)  # NOTE: about -4.0 dbFS at max
     )
 
 

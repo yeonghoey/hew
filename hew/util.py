@@ -1,7 +1,9 @@
+import hashlib
 from inspect import getargspec
 import os
 import re
 import tempfile
+
 
 import pytimeparse
 
@@ -89,3 +91,15 @@ def tempfile_path(ext, dir=None):
 
 def tempdir_path():
     return tempfile.mkdtemp()
+
+
+def sha1of(filepath):
+    sha1 = hashlib.sha1()
+    bufsize = 1024*1024  # 1 MB
+    with open(filepath, 'rb') as f:
+        while True:
+            data = f.read(bufsize)
+            if not data:
+                break
+            sha1.update(data)
+    return sha1.hexdigest()
