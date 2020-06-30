@@ -21,34 +21,34 @@ def quit_(app, save_settings):
 
 
 @scheme
-def toggle(vlc_main, vlc_sub, sub_view, play, pause):
+def toggle(vlc_main, vlc_sub, state, play, pause):
     def f():
-        if vlc_main.is_playing():
-            pause()
+        current_vlc = state['current_vlc']
+        vlc_current = (vlc_main if current_vlc == 'main' else
+                       vlc_sub)
+        if vlc_current.is_playing():
+            pause(vlc_current)
         else:
-            if vlc_sub.is_playing():
-                vlc_sub.stop()
-            if sub_view is not None:
-                sub_view.hide()
-            play()
+            play(vlc_current)
     return f
 
 
 @scheme
-def play(vlc_main, show_action):
-    def f():
-        vlc_main.play()
+def play(show_action):
+    def f(vlc_player):
+        vlc_player.play()
         show_action('play')
 
     return f
 
 
 @scheme
-def pause(vlc_main, show_action):
-    def f():
-        # NOTE: vlc_main.pause() acts like toggle,
-        # but does not act consistently.
-        vlc_main.set_pause(1)
+def pause(show_action):
+    def f(vlc_player):
+        # NOTE: Use vlc_main.set_pause() instead of
+        # vlc_main.pause(), which acts like toggle,
+        # because it doesn't work consistently.
+        vlc_player.set_pause(1)
         show_action('pause')
     return f
 
@@ -99,7 +99,6 @@ def hew(vlc_main,
         video,
         audio,
         state,
-        pause,
         dump_media,
         play_hewn):
 
@@ -111,8 +110,7 @@ def hew(vlc_main,
         if left >= right:
             return
 
-        pause()
-
+        vlc_main.set_pause(1)
         if state['try_video'] and video is not None:
             hewn = subclip(video, left, right)
             temppath = tempfile_path('.mp4')
@@ -214,7 +212,7 @@ def dump_recognized(state,
 
 
 @scheme
-def play_hewn(vlc_sub, sub_view, state, pause, show_action, right_duration):
+def play_hewn(vlc_main, vlc_sub, sub_view, state, set_current_vlc, show_action, right_duration):
     def f(side=None):
         path = state['last_hewn_path']
         side = state['last_hewn_side'] if side is None else side
@@ -223,13 +221,13 @@ def play_hewn(vlc_sub, sub_view, state, pause, show_action, right_duration):
         if not path:
             return
 
-        pause()
+        set_current_vlc('sub')
         vlc_sub.set_mrl(path)
         vlc_sub.play()
 
         # NOTE: show sub_view only when it's available and
         # the hewn file is video. The best way to classify this would be to check
-        # if there's video output on VLC. Found there's VLC API 
+        # if there's video output on VLC. Found there's VLC API
         # 'vlc.libvlc_media_player_has_vout()' for checking that.
         # Unfortunately it doesn't work because "vlc_sub.set_mrl(path)" call is async call
         # and at this point the VLC player information is not updated.
@@ -304,6 +302,24 @@ def set_position(vlc_main):
 def show_action(action_label):
     def f(s):
         action_label.setText(s)
+    return f
+
+
+@scheme
+def set_current_vlc(state, current_vlc_label, vlc_main, main_view, vlc_sub, sub_view, slider):
+    def f(s):
+        assert s == 'main' or s == 'sub'
+        if s == 'main':
+            vlc_sub.stop()
+            sub_view.hide()
+            slider.setEnabled(True)
+        if s == 'sub':
+            vlc_main.set_pause(1)
+            slider.setEnabled(False)
+
+        state['current_vlc'] = s
+        current_vlc_label.setText(s)
+
     return f
 
 

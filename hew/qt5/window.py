@@ -17,6 +17,7 @@ scheme = Scheme()
 # | window  |
 # +---------+
 
+
 class Window(DraggingMixin, QWidget):
     def __init__(self, main_view, sub_view, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -37,25 +38,20 @@ class Window(DraggingMixin, QWidget):
             return
         x = pos.x()
         y = pos.y()
-        self.main_view.move(x, y - self._view_height(self.main_view))
+        self.main_view.move(x, y - self.main_view.height())
 
     def _attach_sub_view(self, pos):
-        if self.main_view is None:
-            return
         if self.sub_view is None:
             return
         x = pos.x()
         y = pos.y()
-        self.sub_view.move(x, y - self._view_height(self.sub_view))
-
-    def _view_height(self, view):
-        return view.style().pixelMetric(QStyle.PM_TitleBarHeight) + view.height()
+        self.sub_view.move(x, y - self.sub_view.height())
 
 
 @scheme
 def window(app, main_view, sub_view, layout, screen):
     window = Window(main_view, sub_view)
-    window.setFixedWidth(640)
+    window.setFixedWidth(960)
     window.setLayout(layout)
     window.show()
     window.activateWindow()
@@ -88,8 +84,7 @@ def main_view(app, video):
         return None
 
     player_view = PlayerView()
-    player_view.setWindowFlags(Qt.Window)
-    player_view.setWindowTitle('Main')
+    player_view.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
     # NOTE: View size will be updated by resize()
     player_view.show()
     player_view.raise_()
@@ -102,8 +97,7 @@ def sub_view(app, video):
         return None
 
     player_view = PlayerView()
-    player_view.setWindowFlags(Qt.Window)
-    player_view.setWindowTitle('Sub')
+    player_view.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
     # NOTE: View size will be updated by resize().
     # Calling show() even though it will be hidden initially,
     # because QWidget should be shown before any other positioning operations.
@@ -126,6 +120,7 @@ def layout(app, indicator_layout, slider_layout, clipbox):
 def indicator_layout(app,
                      title_label,
                      mark_label,
+                     current_vlc_label,
                      try_video_label,
                      action_label,
                      font_metrics):
@@ -146,6 +141,7 @@ def indicator_layout(app,
     layout.addSpacing(font_metrics.width('mm'))
 
     right = QVBoxLayout()
+    right.addWidget(current_vlc_label)
     right.addWidget(try_video_label)
     layout.addLayout(right, stretch=0)
 
@@ -170,6 +166,13 @@ def mark_label(app, font_metrics):
     label = QLabel(z)
     width = font_metrics.width(z)
     label.setFixedWidth(width)
+    return label
+
+
+@scheme
+def current_vlc_label(app, state):
+    t = state['current_vlc']
+    label = QLabel(t)
     return label
 
 
