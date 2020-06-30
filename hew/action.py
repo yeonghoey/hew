@@ -21,13 +21,15 @@ def quit_(app, save_settings):
 
 
 @scheme
-def toggle(vlc_main, vlc_sub, play, pause):
+def toggle(vlc_main, vlc_sub, sub_view, play, pause):
     def f():
         if vlc_main.is_playing():
             pause()
         else:
             if vlc_sub.is_playing():
                 vlc_sub.stop()
+            if sub_view is not None:
+                sub_view.hide()
             play()
     return f
 
@@ -93,7 +95,7 @@ def hew(vlc_main,
         anki_media,
         video_no_sound,
         video_no_resize,
-        player_view,
+        main_view,
         video,
         audio,
         state,
@@ -116,7 +118,7 @@ def hew(vlc_main,
             temppath = tempfile_path('.mp4')
             ffmpeg_params = []
             if not video_no_resize:
-                w, h = player_view.width(), player_view.height()
+                w, h = main_view.width(), main_view.height()
                 # ffmpeg requires sizes to be even
                 w, h = (w//2)*2, (h//2)*2
                 ffmpeg_params.extend(['-vf', 'scale=%s:%s' % (w, h)])
@@ -212,7 +214,7 @@ def dump_recognized(state,
 
 
 @scheme
-def play_hewn(vlc_sub, state, pause, show_action, right_duration):
+def play_hewn(vlc_sub, sub_view, state, pause, show_action, right_duration):
     def f(side=None):
         path = state['last_hewn_path']
         side = state['last_hewn_side'] if side is None else side
@@ -222,6 +224,9 @@ def play_hewn(vlc_sub, state, pause, show_action, right_duration):
             return
 
         pause()
+        if sub_view is not None:
+            sub_view.show()
+            sub_view.raise_()
         vlc_sub.set_mrl(path)
         vlc_sub.play()
 
@@ -248,17 +253,17 @@ def clip(clipbox):
 
 @scheme
 def take_snapshot(vlc_main,
-                  player_view,
+                  main_view,
                   snapshot_dir,
                   clip_image,
                   show_action):
 
     def f():
-        if player_view is None:
+        if main_view is None:
             return
         path = tempfile_path('.png', snapshot_dir)
-        w = player_view.width()
-        h = player_view.height()
+        w = main_view.width()
+        h = main_view.height()
         vlc_main.video_take_snapshot(0, path, w, h)
         clip_image(path)
         show_action('take-screenshot')
@@ -299,9 +304,11 @@ def update_mark(mark_label):
 
 
 @scheme
-def resize(screen, window, player_view, video, state):
+def resize(screen, window, main_view, sub_view, video, state):
     def f(x, absolute=False):
-        if player_view is None:
+        if main_view is None:
+            return
+        if sub_view is None:
             return
 
         if absolute:
@@ -313,16 +320,18 @@ def resize(screen, window, player_view, video, state):
         width = min(max(64, w*scale), screen.width())
         height = min(max(64, h*scale), screen.height())
         if w*scale == width and h*scale == height:
-            player_view.setFixedWidth(width)
-            player_view.setFixedHeight(height)
-            window.attach_player_view(window.pos())
+            main_view.setFixedWidth(width)
+            main_view.setFixedHeight(height)
+            sub_view.setFixedWidth(width//2)
+            sub_view.setFixedHeight(height//2)
+            window.sync_view_positions(window.pos())
             state['scale'] = scale
 
     return f
 
 
 @scheme
-def cycle_subtitles(player_view, vlc_main, state, show_action):
+def cycle_subtitles(main_view, vlc_main, state, show_action):
     def f():
         count = vlc_main.video_get_spu_count()
         if count <= 0:

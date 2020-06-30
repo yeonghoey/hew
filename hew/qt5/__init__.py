@@ -61,20 +61,20 @@ def settings(app):
 
 
 @scheme
-def save_settings(app, settings, window, player_view, state):
+def save_settings(app, settings, window, main_view, state):
     def f():
         settings.setValue('geometry', window.saveGeometry())
-        if player_view is not None:
+        if main_view is not None:
             settings.setValue('scale', state.get('scale', 1.0))
     return f
 
 
 @scheme
-def restore_settings(app, settings, window, player_view, resize):
+def restore_settings(app, settings, window, main_view, sub_view, resize):
     g = settings.value('geometry', None)
     if g is not None:
         window.restoreGeometry(g)
 
-    if player_view is not None:
+    if (main_view is not None) and (sub_view is not None):
         s = settings.value('scale', 1.0, type=float)
         resize(s, absolute=True)

@@ -8,46 +8,72 @@ from hew.util import format_timedelta, format_timedelta_range, Scheme
 
 scheme = Scheme()
 
+# Window is for keeping the layout as below.
+# +-------------------------+
+# |                         |
+# |  main_view +------------+
+# |            | [sub_view] |
+# +---------+--+------------+
+# | window  |
+# +---------+
+
 
 class Window(DraggingMixin, QWidget):
-    def __init__(self, player_view, *args, **kwargs):
+    def __init__(self, main_view, sub_view, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.player_view = player_view
+        self.main_view = main_view
+        self.sub_view = sub_view
         self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
 
     def moveEvent(self, event):
         super().moveEvent(event)
-        self.attach_player_view(event.pos())
+        self.sync_view_positions(event.pos())
 
-    def attach_player_view(self, pos):
-        if self.player_view is None:
+    def sync_view_positions(self, pos):
+        self._attach_main_view(pos)
+        self._attach_sub_view(pos)
+
+    def _attach_main_view(self, pos):
+        if self.main_view is None:
             return
         x = pos.x()
         y = pos.y()
-        self.player_view.move(x, y - self.player_view.height())
+        self.main_view.move(x, y - self.main_view.height())
+
+    def _attach_sub_view(self, pos):
+        if self.main_view is None:
+            return
+        if self.sub_view is None:
+            return
+        x = pos.x()
+        y = pos.y()
+        self.sub_view.move(x + self.main_view.width() - self.sub_view.width(),
+                           y - self.sub_view.height())
 
 
 @scheme
-def window(app, player_view, layout, screen):
-    window = Window(player_view)
+def window(app, main_view, sub_view, layout, screen):
+    window = Window(main_view, sub_view)
     window.setFixedWidth(640)
     window.setLayout(layout)
     window.show()
     window.activateWindow()
     window.raise_()
 
-    # Center window
-    if player_view is None:
-        window.move(screen.center() - window.rect().center())
-    else:
-        setattr(player_view, '_activation_target', window)
+    if main_view is not None:
+        setattr(main_view, '_activation_target', window)
+    if sub_view is not None:
+        setattr(sub_view, '_activation_target', window)
 
-        # x: center based on player_view
-        # y: center based on both
-        center = screen.center() - player_view.rect().center()
+    # Move the window and views on the default position.
+    # x: center based on main_view
+    # y: center based on both
+    if main_view is not None:
+        center = screen.center() - main_view.rect().center()
         cx, cy = center.x(), center.y() - window.height()/2
-        window.move(cx, cy + player_view.height())
-
+        window.move(cx, cy + main_view.height())
+    else:
+        window.move(screen.center() - window.rect().center())
     return window
 
 
@@ -56,15 +82,31 @@ class PlayerView(ActivationHandoverMixin, QWidget):
 
 
 @scheme
-def player_view(app, video):
+def main_view(app, video):
     if video is None:
         return None
 
     player_view = PlayerView()
     player_view.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
-    player_view.setFixedSize(*video.size)
+    # NOTE: View size will be updated by resize()
     player_view.show()
     player_view.raise_()
+    return player_view
+
+
+@scheme
+def sub_view(app, video):
+    if video is None:
+        return None
+
+    player_view = PlayerView()
+    player_view.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
+    # NOTE: View size will be updated by resize().
+    # Calling show() even though it will be hidden initially,
+    # because QWidget should be shown before any other positioning operations.
+    # SEE: https://www.qtcentre.org/threads/5151-Need-to-know-widget-size-before-first-shown
+    player_view.show()
+    player_view.hide()
     return player_view
 
 
