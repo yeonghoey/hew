@@ -183,6 +183,7 @@ def try_video_label(app, state, try_video_label_text):
 @scheme
 def try_video_label_text():
     def f(try_video):
+        # NOTE: hewn files can only be either mp4 or mp3.
         return 'mp4' if try_video else 'mp3'
     return f
 

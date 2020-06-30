@@ -224,11 +224,23 @@ def play_hewn(vlc_sub, sub_view, state, pause, show_action, right_duration):
             return
 
         pause()
-        if sub_view is not None:
-            sub_view.show()
-            sub_view.raise_()
         vlc_sub.set_mrl(path)
         vlc_sub.play()
+
+        # NOTE: show sub_view only when it's available and
+        # the hewn file is video. The best way to classify this would be to check
+        # if there's video output on VLC. Found there's VLC API 
+        # 'vlc.libvlc_media_player_has_vout()' for checking that.
+        # Unfortunately it doesn't work because "vlc_sub.set_mrl(path)" call is async call
+        # and at this point the VLC player information is not updated.
+        # Instead, as a workaround, checks whether the extension of the hewn file is mp4
+        # because hewn files can only be either mp4 or mp3.
+        if sub_view is not None:
+            if path.endswith('.mp4'):
+                sub_view.show()
+                sub_view.raise_()
+            else:
+                sub_view.hide()
 
         duration = right - left
         if side == 'right' and duration != 0:
