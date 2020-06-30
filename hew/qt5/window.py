@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import (
-    QSlider, QHBoxLayout, QVBoxLayout, QWidget, QLabel, QPlainTextEdit)
+    QSlider, QHBoxLayout, QVBoxLayout, QWidget, QLabel, QPlainTextEdit, QStyle)
 
 from hew.qt5.mixin import ActivationHandoverMixin, DraggingMixin
 from hew.util import format_timedelta, format_timedelta_range, Scheme
@@ -9,14 +9,13 @@ from hew.util import format_timedelta, format_timedelta_range, Scheme
 scheme = Scheme()
 
 # Window is for keeping the layout as below.
-# +-------------------------+
-# |                         |
-# |  main_view +------------+
-# |            | [sub_view] |
-# +---------+--+------------+
+# +----------------------+
+# |                      |
+# |  main_view[sub_view] |
+# |                      |
+# +---------+------------+
 # | window  |
 # +---------+
-
 
 class Window(DraggingMixin, QWidget):
     def __init__(self, main_view, sub_view, *args, **kwargs):
@@ -38,7 +37,7 @@ class Window(DraggingMixin, QWidget):
             return
         x = pos.x()
         y = pos.y()
-        self.main_view.move(x, y - self.main_view.height())
+        self.main_view.move(x, y - self._view_height(self.main_view))
 
     def _attach_sub_view(self, pos):
         if self.main_view is None:
@@ -47,8 +46,10 @@ class Window(DraggingMixin, QWidget):
             return
         x = pos.x()
         y = pos.y()
-        self.sub_view.move(x + self.main_view.width() - self.sub_view.width(),
-                           y - self.sub_view.height())
+        self.sub_view.move(x, y - self._view_height(self.sub_view))
+
+    def _view_height(self, view):
+        return view.style().pixelMetric(QStyle.PM_TitleBarHeight) + view.height()
 
 
 @scheme
@@ -87,7 +88,8 @@ def main_view(app, video):
         return None
 
     player_view = PlayerView()
-    player_view.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
+    player_view.setWindowFlags(Qt.Window)
+    player_view.setWindowTitle('Main')
     # NOTE: View size will be updated by resize()
     player_view.show()
     player_view.raise_()
@@ -100,7 +102,8 @@ def sub_view(app, video):
         return None
 
     player_view = PlayerView()
-    player_view.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
+    player_view.setWindowFlags(Qt.Window)
+    player_view.setWindowTitle('Sub')
     # NOTE: View size will be updated by resize().
     # Calling show() even though it will be hidden initially,
     # because QWidget should be shown before any other positioning operations.

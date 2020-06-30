@@ -322,8 +322,8 @@ def resize(screen, window, main_view, sub_view, video, state):
         if w*scale == width and h*scale == height:
             main_view.setFixedWidth(width)
             main_view.setFixedHeight(height)
-            sub_view.setFixedWidth(width//2)
-            sub_view.setFixedHeight(height//2)
+            sub_view.setFixedWidth(width)
+            sub_view.setFixedHeight(height)
             window.sync_view_positions(window.pos())
             state['scale'] = scale
 
