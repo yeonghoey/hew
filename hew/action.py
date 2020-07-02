@@ -21,11 +21,11 @@ def quit_(app, save_settings):
 
 
 @scheme
-def toggle(vlc_main, vlc_sub, state, play, pause):
+def toggle(main_vlc, sub_vlc, state, play, pause):
     def f():
         current_player = state['current_player']
-        vlc_current = (vlc_main if current_player == 'main' else
-                       vlc_sub)
+        vlc_current = (main_vlc if current_player == 'main' else
+                       sub_vlc)
         if vlc_current.is_playing():
             pause(vlc_current)
         else:
@@ -45,8 +45,8 @@ def play(show_action):
 @scheme
 def pause(show_action):
     def f(vlc_player):
-        # NOTE: Use vlc_main.set_pause() instead of
-        # vlc_main.pause(), which acts like toggle,
+        # NOTE: Use main_vlc.set_pause() instead of
+        # main_vlc.pause(), which acts like toggle,
         # because it doesn't work consistently.
         vlc_player.set_pause(1)
         show_action('pause')
@@ -54,21 +54,21 @@ def pause(show_action):
 
 
 @scheme
-def seek(vlc_main, clamp, show_action):
+def seek(main_vlc, clamp, show_action):
     def f(ms):
-        t = vlc_main.get_time() + ms
-        vlc_main.set_time(clamp(t))
+        t = main_vlc.get_time() + ms
+        main_vlc.set_time(clamp(t))
         show_action('%+ds' % (ms/1000))
     return f
 
 
 @scheme
-def mark(vlc_main, state, show_action, update_mark):
+def mark(main_vlc, state, show_action, update_mark):
     def f(side):
         assert side == 'left' or side == 'right'
         # NOTE: Ensure that newly marked hewn to be played at start(left).
         state['last_hewn_side'] = 'left'
-        state[side] = vlc_main.get_time()
+        state[side] = main_vlc.get_time()
         show_action('%s' % side)
         update_mark(state['left'], state['right'])
     return f
@@ -89,8 +89,8 @@ def adjust(state, clamp, show_action, update_mark):
 
 
 @scheme
-def hew(vlc_main,
-        vlc_sub,
+def hew(main_vlc,
+        sub_vlc,
         anki,
         anki_media,
         video_no_sound,
@@ -110,7 +110,7 @@ def hew(vlc_main,
         if left >= right:
             return
 
-        vlc_main.set_pause(1)
+        main_vlc.set_pause(1)
         if state['try_video'] and video is not None:
             hewn = subclip(video, left, right)
             temppath = tempfile_path('.mp4')
@@ -145,7 +145,7 @@ def hew(vlc_main,
         play_hewn()
 
         # Seek to the right end
-        vlc_main.set_time(right)
+        main_vlc.set_time(right)
 
     return f
 
@@ -212,7 +212,7 @@ def dump_recognized(state,
 
 
 @scheme
-def play_hewn(vlc_main, vlc_sub, sub_view, state, set_current_player, show_action, right_duration):
+def play_hewn(main_vlc, sub_vlc, sub_view, state, set_current_player, show_action, right_duration):
     def f(side=None):
         path = state['last_hewn_path']
         side = state['last_hewn_side'] if side is None else side
@@ -222,14 +222,14 @@ def play_hewn(vlc_main, vlc_sub, sub_view, state, set_current_player, show_actio
             return
 
         set_current_player('sub')
-        vlc_sub.set_mrl(path)
-        vlc_sub.play()
+        sub_vlc.set_mrl(path)
+        sub_vlc.play()
 
         # NOTE: show sub_view only when it's available and
         # the hewn file is video. The best way to classify this would be to check
         # if there's video output on VLC. Found there's VLC API
         # 'vlc.libvlc_media_player_has_vout()' for checking that.
-        # Unfortunately it doesn't work because "vlc_sub.set_mrl(path)" call is async call
+        # Unfortunately it doesn't work because "sub_vlc.set_mrl(path)" call is async call
         # and at this point the VLC player information is not updated.
         # Instead, as a workaround, checks whether the extension of the hewn file is mp4
         # because hewn files can only be either mp4 or mp3.
@@ -245,7 +245,7 @@ def play_hewn(vlc_main, vlc_sub, sub_view, state, set_current_player, show_actio
             # NOTE: For some reason, set_time() doesn't work properly,
             # while set_position() works as expected
             pos = max(0, duration - right_duration) / duration
-            vlc_sub.set_position(pos)
+            sub_vlc.set_position(pos)
 
         filename = os.path.basename(path)
         hewn_duration = format_timedelta(duration)
@@ -262,7 +262,7 @@ def clip(clipbox):
 
 
 @scheme
-def take_snapshot(vlc_main,
+def take_snapshot(main_vlc,
                   main_view,
                   snapshot_dir,
                   clip_image,
@@ -274,27 +274,27 @@ def take_snapshot(vlc_main,
         path = tempfile_path('.png', snapshot_dir)
         w = main_view.width()
         h = main_view.height()
-        vlc_main.video_take_snapshot(0, path, w, h)
+        main_vlc.video_take_snapshot(0, path, w, h)
         clip_image(path)
         show_action('take-screenshot')
     return f
 
 
 @scheme
-def reload_(vlc_main, main_path, show_action):
+def reload_(main_vlc, main_path, show_action):
     def f():
-        ms = vlc_main.get_time()
-        vlc_main.set_mrl(main_path)
-        vlc_main.play()
-        vlc_main.set_time(ms)
+        ms = main_vlc.get_time()
+        main_vlc.set_mrl(main_path)
+        main_vlc.play()
+        main_vlc.set_time(ms)
         show_action('reload')
     return f
 
 
 @scheme
-def set_position(vlc_main):
+def set_position(main_vlc):
     def f(ms):
-        vlc_main.set_time(ms)
+        main_vlc.set_time(ms)
     return f
 
 
@@ -306,15 +306,15 @@ def show_action(action_label):
 
 
 @scheme
-def set_current_player(state, current_player_label, vlc_main, main_view, vlc_sub, sub_view, slider):
+def set_current_player(state, current_player_label, main_vlc, main_view, sub_vlc, sub_view, slider):
     def f(s):
         assert s == 'main' or s == 'sub'
         if s == 'main':
-            vlc_sub.stop()
+            sub_vlc.stop()
             sub_view.hide()
             slider.setEnabled(True)
         if s == 'sub':
-            vlc_main.set_pause(1)
+            main_vlc.set_pause(1)
             slider.setEnabled(False)
 
         state['current_player'] = s
@@ -359,9 +359,9 @@ def resize(screen, window, main_view, sub_view, video, state):
 
 
 @scheme
-def cycle_subtitles(main_view, vlc_main, state, show_action):
+def cycle_subtitles(main_view, main_vlc, state, show_action):
     def f():
-        count = vlc_main.video_get_spu_count()
+        count = main_vlc.video_get_spu_count()
         if count <= 0:
             return
 
@@ -370,7 +370,7 @@ def cycle_subtitles(main_view, vlc_main, state, show_action):
         nxt = state['next_spu']
         ret = -1
         while ret != 0:
-            ret = vlc_main.video_set_spu(nxt)
+            ret = main_vlc.video_set_spu(nxt)
             if ret == 0:
                 show_action('subtitles %d' % nxt)
             # How spu number is determined is not documented.

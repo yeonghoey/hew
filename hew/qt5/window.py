@@ -253,10 +253,10 @@ def clipbox(app, font_metrics):
 
 
 @scheme
-def tick(app, window, slider, vlc_main):
+def tick(app, window, slider, main_vlc):
 
     def update_slider():
-        ms = vlc_main.get_time()
+        ms = main_vlc.get_time()
         slider.setValue(ms)
 
     timer = QTimer(window)

@@ -15,7 +15,7 @@ def vlc_instance(vlc_quiet):
 
 
 @scheme
-def vlc_main(vlc_instance,
+def main_vlc(vlc_instance,
              main_view,
              main_path,
              start_at_ms):
@@ -31,7 +31,7 @@ def vlc_main(vlc_instance,
 
 
 @scheme
-def vlc_sub(vlc_instance, sub_view):
+def sub_vlc(vlc_instance, sub_view):
     p = vlc_instance.media_player_new()
     if sub_view is not None:
         nsview = int(sub_view.winId())
