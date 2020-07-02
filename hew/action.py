@@ -23,8 +23,8 @@ def quit_(app, save_settings):
 @scheme
 def toggle(vlc_main, vlc_sub, state, play, pause):
     def f():
-        current_vlc = state['current_vlc']
-        vlc_current = (vlc_main if current_vlc == 'main' else
+        current_player = state['current_player']
+        vlc_current = (vlc_main if current_player == 'main' else
                        vlc_sub)
         if vlc_current.is_playing():
             pause(vlc_current)
@@ -212,7 +212,7 @@ def dump_recognized(state,
 
 
 @scheme
-def play_hewn(vlc_main, vlc_sub, sub_view, state, set_current_vlc, show_action, right_duration):
+def play_hewn(vlc_main, vlc_sub, sub_view, state, set_current_player, show_action, right_duration):
     def f(side=None):
         path = state['last_hewn_path']
         side = state['last_hewn_side'] if side is None else side
@@ -221,7 +221,7 @@ def play_hewn(vlc_main, vlc_sub, sub_view, state, set_current_vlc, show_action, 
         if not path:
             return
 
-        set_current_vlc('sub')
+        set_current_player('sub')
         vlc_sub.set_mrl(path)
         vlc_sub.play()
 
@@ -306,7 +306,7 @@ def show_action(action_label):
 
 
 @scheme
-def set_current_vlc(state, current_vlc_label, vlc_main, main_view, vlc_sub, sub_view, slider):
+def set_current_player(state, current_player_label, vlc_main, main_view, vlc_sub, sub_view, slider):
     def f(s):
         assert s == 'main' or s == 'sub'
         if s == 'main':
@@ -317,8 +317,8 @@ def set_current_vlc(state, current_vlc_label, vlc_main, main_view, vlc_sub, sub_
             vlc_main.set_pause(1)
             slider.setEnabled(False)
 
-        state['current_vlc'] = s
-        current_vlc_label.setText(s)
+        state['current_player'] = s
+        current_player_label.setText(s)
 
     return f
 

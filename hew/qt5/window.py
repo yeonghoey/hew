@@ -120,7 +120,7 @@ def layout(app, indicator_layout, slider_layout, clipbox):
 def indicator_layout(app,
                      title_label,
                      mark_label,
-                     current_vlc_label,
+                     current_player_label,
                      try_video_label,
                      action_label,
                      font_metrics):
@@ -141,7 +141,7 @@ def indicator_layout(app,
     layout.addSpacing(font_metrics.width('mm'))
 
     right = QVBoxLayout()
-    right.addWidget(current_vlc_label)
+    right.addWidget(current_player_label)
     right.addWidget(try_video_label)
     layout.addLayout(right, stretch=0)
 
@@ -170,8 +170,8 @@ def mark_label(app, font_metrics):
 
 
 @scheme
-def current_vlc_label(app, state):
-    t = state['current_vlc']
+def current_player_label(app, state):
+    t = state['current_player']
     label = QLabel(t)
     return label
 

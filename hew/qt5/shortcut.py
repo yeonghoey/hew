@@ -24,10 +24,10 @@ def shortcut_toggle(app, window, toggle):
 
 
 @scheme
-def shortcut_set_main(app, window, set_current_vlc):
+def shortcut_set_main(app, window, set_current_player):
     k = QKeySequence('Escape')
     s = QShortcut(k, window)
-    s.activated.connect(lambda: set_current_vlc('main'))
+    s.activated.connect(lambda: set_current_player('main'))
     return s
 
 

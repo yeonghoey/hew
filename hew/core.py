@@ -134,7 +134,7 @@ def state(video):
         'scale': 1.,
         'next_spu': -1,  # Disabled
         'try_video': video is not None,  # Toggle with Tab
-        'current_vlc': 'main',  # main or sub
+        'current_player': 'main',  # main or sub
     }
 
 
