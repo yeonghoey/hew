@@ -262,21 +262,35 @@ def clip(clipbox):
 
 
 @scheme
-def take_snapshot(main_vlc,
+def take_snapshot(state,
+                  main_vlc,
                   main_view,
+                  sub_vlc,
+                  sub_view,
                   snapshot_dir,
                   clip_image,
                   show_action):
 
     def f():
+        # NOTE: At least main_view should be valid
         if main_view is None:
             return
+
+        # NOTE: sub_view may not be visible if the last hewn file was mp3.
+        # take a snapshot of it when only it's visible.
+        if (state['current_player'] == 'sub' and
+                sub_view is not None and
+                sub_view.isVisible()):
+            vlc, view = sub_vlc, sub_view
+        else:
+            vlc, view = main_vlc, main_view
+
         path = tempfile_path('.png', snapshot_dir)
-        w = main_view.width()
-        h = main_view.height()
-        main_vlc.video_take_snapshot(0, path, w, h)
+        w = view.width()
+        h = view.height()
+        vlc.video_take_snapshot(0, path, w, h)
         clip_image(path)
-        show_action('take-screenshot')
+        show_action('take-snapshot')
     return f
 
 
