@@ -295,12 +295,13 @@ def take_snapshot(state,
 
 
 @scheme
-def reload_(main_vlc, main_path, show_action):
+def reload_(main_vlc, main_path, set_current_player, show_action):
     def f():
         ms = main_vlc.get_time()
         main_vlc.set_mrl(main_path)
         main_vlc.play()
         main_vlc.set_time(ms)
+        set_current_player('main')
         show_action('reload')
     return f
 
