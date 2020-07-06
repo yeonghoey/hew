@@ -162,10 +162,7 @@ def action_label(app):
 
 @scheme
 def mark_label(app, font_metrics):
-    z = format_timedelta_range(left_ms=0, right_ms=0)
-    label = QLabel(z)
-    width = font_metrics.width(z)
-    label.setFixedWidth(width)
+    label = QLabel()
     return label
 
 

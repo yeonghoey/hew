@@ -248,8 +248,7 @@ def play_hewn(main_vlc, sub_vlc, sub_view, state, set_current_player, show_actio
             sub_vlc.set_position(pos)
 
         filename = os.path.basename(path)
-        hewn_duration = format_timedelta(duration)
-        show_action('%s (%s)' % (filename, hewn_duration))
+        show_action('%s' % filename)
     return f
 
 
@@ -341,9 +340,18 @@ def set_current_player(state, current_player_label, main_vlc, main_view, sub_vlc
 @scheme
 def update_mark(mark_label):
     def f(l, r):
-        s = format_timedelta_range(l, r)
-        mark_label.setText(s)
+        td_range = format_timedelta_range(l, r)
+        td_duration = (format_timedelta(r-l) if r-l > 0 else
+                       '-')
+        text = '%s (%s)' % (td_range, td_duration)
+        mark_label.setText(text)
     return f
+
+
+@scheme
+def init_mark_label(update_mark):
+    update_mark(0, 0)
+    return None
 
 
 @scheme
