@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import QEvent, Qt, QTimer
 from PyQt5.QtWidgets import (
     QSlider, QHBoxLayout, QVBoxLayout, QWidget, QLabel, QPlainTextEdit, QStyle)
 
@@ -24,6 +24,15 @@ class Window(DraggingMixin, QWidget):
         self.main_view = main_view
         self.sub_view = sub_view
         self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
+
+    def event(self, e):
+        if e.type() == QEvent.WindowActivate:
+            if self.main_view is not None:
+                self.main_view.raise_()
+            if self.sub_view is not None:
+                self.sub_view.raise_()
+            self.raise_()
+        return super().event(e)
 
     def moveEvent(self, event):
         super().moveEvent(event)
