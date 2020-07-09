@@ -8,206 +8,172 @@ scheme = Scheme()
 
 
 @scheme
-def shortcut_quit(app, window, quit_):
-    k = QKeySequence('Q')
-    s = QShortcut(k, window)
-    s.activated.connect(quit_)
-    return s
+def all_shortcut_keys():
+    # NOTE: For validating whether or not there are duplicate shortcut definitions.
+    # Since the elements can be either a string or a StandardKey, which is unhashable,
+    # use list instead of set.
+    return []
 
 
 @scheme
-def shortcut_toggle(app, window, toggle):
-    k = QKeySequence(' ')
-    s = QShortcut(k, window)
-    s.activated.connect(toggle)
-    return s
+def shortcut(all_shortcut_keys, window, ):
+    def f(keys, slot):
+        # NOTE: Check if there is a already shortcut for the same key
+        assert all(key not in all_shortcut_keys for key in keys)
+        all_shortcut_keys.extend(keys)
+
+        shortcuts = [QShortcut(QKeySequence(key), window)
+                     for key in keys]
+        for s in shortcuts:
+            s.activated.connect(slot)
+        return shortcuts
+    return f
 
 
 @scheme
-def shortcut_set_main(app, window, set_current_player):
-    k = QKeySequence('Escape')
-    s = QShortcut(k, window)
-    s.activated.connect(lambda: set_current_player('main'))
-    return s
+def shortcut_quit(shortcut, quit_):
+    return shortcut([QKeySequence.Quit], quit_)
 
 
 @scheme
-def shortcut_seek(app, window, seek):
-    def add(ch, ms):
-        k = QKeySequence(ch)
-        s = QShortcut(k, window)
-        s.activated.connect(lambda: seek(ms))
-        return s
+def shortcut_toggle(shortcut, toggle):
+    return shortcut([' '], toggle)
 
+
+@scheme
+def shortcut_set_main(shortcut, set_current_player):
+    return shortcut(['Escape'],
+                    lambda: set_current_player('main'))
+
+
+@ scheme
+def shortcut_seek(shortcut, seek):
+    def add(keys, ms):
+        return shortcut(keys, lambda: seek(ms))
     return [
-        add('J', -2000),
-        add('Shift+J', -30000),
-        add('l', +2000),
-        add('Shift+L', +30000),
+        add(['j', 'ㅓ'], -2000),
+        add(['l', 'ㅣ'], +2000),
+        add(['Shift+j', 'Shift+ㅓ'], -30000),
+        add(['Shift+l', 'Shift+ㅣ'], +30000),
     ]
 
 
-@scheme
-def shortcut_mark(app, window, mark, hew):
-    left_k = QKeySequence('K')
-    left_s = QShortcut(left_k, window)
-
+@ scheme
+def shortcut_mark(shortcut, mark, hew):
     def mark_left():
         mark('left')
-    left_s.activated.connect(lambda: mark('left'))
-
-    right_k = QKeySequence('Shift+K')
-    right_s = QShortcut(right_k, window)
 
     def mark_right():
         mark('right')
         hew()
-    right_s.activated.connect(mark_right)
 
-    return (left_s, right_s)
+    return (
+        shortcut(['k', 'ㅏ'], mark_left),
+        shortcut(['Shift+k', 'Shift+ㅏ'], mark_right)
+    )
 
 
-@scheme
-def shortcut_adjust(app, window, mark, adjust):
-    def add(ch, side, ms):
-        k = QKeySequence(ch)
-        s = QShortcut(k, window)
-        s.activated.connect(lambda: adjust(side, ms))
-        return s
+@ scheme
+def shortcut_adjust(shortcut, mark, adjust):
+    def add(keys, side, ms):
+        return shortcut(keys, lambda: adjust(side, ms))
 
     return [
-        add('a', 'left', +100),
-        add('z', 'left', -100),
-        add('s', 'right', +100),
-        add('x', 'right', -100),
+        add(['a', 'ㅁ'], 'left', +100),
+        add(['z', 'ㅋ'], 'left', -100),
+        add(['s', 'ㄴ'], 'right', +100),
+        add(['x', 'ㅌ'], 'right', -100),
     ]
 
 
-@scheme
-def shortcut_hew(app, window, hew):
-    k = QKeySequence('C')
-    s = QShortcut(k, window)
-    s.activated.connect(lambda: hew())
-    return s
+@ scheme
+def shortcut_hew(shortcut, hew):
+    return shortcut(['c', 'ㅊ'], hew)
 
 
-@scheme
-def shortcut_toggle_try_video(app, window, video, state, try_video_label, try_video_label_text):
-    k = QKeySequence('Tab')
-    s = QShortcut(k, window)
-
+@ scheme
+def shortcut_toggle_try_video(shortcut, video, state, try_video_label, try_video_label_text):
     def f():
         try_video = (video is not None) and (not state['try_video'])
         try_video_label.setText(try_video_label_text(try_video))
         state['try_video'] = try_video
 
-    s.activated.connect(f)
-    return s
+    return shortcut(['Tab'], f)
 
 
-@scheme
-def shortcut_dump_srt(app, window, dump_srt):
-    k = QKeySequence('D')
-    s = QShortcut(k, window)
-    s.activated.connect(dump_srt)
-    return s
+@ scheme
+def shortcut_dump_srt(shortcut, dump_srt):
+    return shortcut(['d', 'ㅇ'], dump_srt)
 
 
-@scheme
-def shortcut_dump_recognized(app, window, dump_recognized):
-    k = QKeySequence('Shift+D')
-    s = QShortcut(k, window)
-    s.activated.connect(dump_recognized)
-    return s
+@ scheme
+def shortcut_dump_recognized(shortcut, dump_recognized):
+    return shortcut(['Shift+d', 'Shift+ㅇ'],
+                    dump_recognized)
 
 
-@scheme
-def shortcut_play_hewn_left(app, window, play_hewn):
-    k = QKeySequence('R')
-    s = QShortcut(k, window)
-    s.activated.connect(lambda: play_hewn('left'))
-    return s
+@ scheme
+def shortcut_play_hewn_left(shortcut, play_hewn):
+    return shortcut(['r', 'ㄱ'],
+                    lambda: play_hewn('left'))
 
 
-@scheme
-def shortcut_play_hewn_right(app, window, play_hewn):
-    k = QKeySequence('Shift+R')
-    s = QShortcut(k, window)
-    s.activated.connect(lambda: play_hewn('right'))
-    return s
+@ scheme
+def shortcut_play_hewn_right(shortcut, play_hewn):
+    return shortcut(['Shift+r', 'Shift+ㄱ'],
+                    lambda: play_hewn('right'))
 
 
-@scheme
-def shortcut_reload(app, window, reload_):
-    k = QKeySequence('Ctrl+R')
-    s = QShortcut(k, window)
-    s.activated.connect(reload_)
-    return s
+@ scheme
+def shortcut_reload(shortcut, reload_):
+    return shortcut([QKeySequence.Refresh], reload_)
 
 
-@scheme
-def shortcut_scale(app, window, resize):
+@ scheme
+def shortcut_scale(shortcut, resize):
 
-    def add(key, ratio, absolute=False):
-        k = QKeySequence(key)
-        s = QShortcut(k, window)
-        s.activated.connect(lambda: resize(ratio, absolute))
-        return s
+    def add(keys, ratio, absolute=False):
+        return shortcut(keys, lambda: resize(ratio, absolute))
 
     return [
-        add('Ctrl+-', 0.5),
-        add('Ctrl+0', 1.0, absolute=True),
-        add('Ctrl+=', 2.0),
+        add([QKeySequence.ZoomOut], 0.5),
+        add(['Ctrl+0'], 1.0, absolute=True),
+        add([QKeySequence.ZoomIn], 2.0),
     ]
 
 
-@scheme
-def shortcut_take_snapshot(app, window, take_snapshot):
-    k = QKeySequence('Ctrl+C')
-    s = QShortcut(k, window)
-    s.activated.connect(take_snapshot)
-    return s
+@ scheme
+def shortcut_take_snapshot(shortcut, take_snapshot):
+    return shortcut([QKeySequence.Print], take_snapshot)
 
 
-@scheme
-def shortcut_shift(app, window):
+@ scheme
+def shortcut_shift(shortcut, window):
     def shift(dx, dy):
         window.move(window.x() + dx, window.y() + dy)
 
-    def add(key, dx, dy):
-        k = QKeySequence(key)
-        s = QShortcut(k, window)
-        s.activated.connect(lambda: shift(dx, dy))
-        return s
+    def add(keys, dx, dy):
+        return shortcut(keys, lambda: shift(dx, dy))
 
     STEP = 16
     return [
-        add('Left', -STEP, 0),
-        add('Right', +STEP, 0),
-        add('Up', 0, -STEP),
-        add('Down', 0, +STEP),
+        add(['Left'], -STEP, 0),
+        add(['Right'], +STEP, 0),
+        add(['Up'], 0, -STEP),
+        add(['Down'], 0, +STEP),
     ]
 
 
-@scheme
-def shortcut_cycle_subtitles(app, window, cycle_subtitles):
-    k = QKeySequence('Ctrl+S')
-    s = QShortcut(k, window)
-    s.activated.connect(cycle_subtitles)
-    return s
+@ scheme
+def shortcut_cycle_subtitles(shortcut, cycle_subtitles):
+    return shortcut(['`', '₩'], cycle_subtitles)
 
 
-@scheme
-def shortcut_yank(app, window, yank):
-    k = QKeySequence('Y')
-    s = QShortcut(k, window)
-    s.activated.connect(yank)
-    return s
+@ scheme
+def shortcut_yank(shortcut, yank):
+    return shortcut(['y', 'ㅛ'], yank)
 
 
-@scheme
-def shortcut_yank_source(app, window, yank_source):
-    k = QKeySequence('Shift+Y')
-    s = QShortcut(k, window)
-    s.activated.connect(yank_source)
-    return s
+@ scheme
+def shortcut_yank_source(shortcut, yank_source):
+    return shortcut(['Shift+y', 'Shift+ㅛ'], yank_source)

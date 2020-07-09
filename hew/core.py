@@ -153,7 +153,7 @@ def recognize_hewn(state):
     def f(path):
         mp3 = AudioFileClip(path)
         wav_path = tempfile_path('.wav')
-        mp3.write_audiofile(wav_path, verbose=False, progress_bar=False)
+        mp3.write_audiofile(wav_path)
 
         r = sr.Recognizer()
         with sr.AudioFile(wav_path) as source:
