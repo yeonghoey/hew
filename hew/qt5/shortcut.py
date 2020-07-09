@@ -31,11 +31,6 @@ def shortcut(all_shortcut_keys, window, ):
 
 
 @scheme
-def shortcut_quit(shortcut, quit_):
-    return shortcut([QKeySequence.Quit], quit_)
-
-
-@scheme
 def shortcut_toggle(shortcut, toggle):
     return shortcut([' '], toggle)
 

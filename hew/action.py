@@ -13,14 +13,6 @@ scheme = Scheme()
 
 
 @scheme
-def quit_(app, save_settings):
-    def f():
-        save_settings()
-        app.exit()
-    return f
-
-
-@scheme
 def toggle(main_vlc, sub_vlc, state, play, pause):
     def f():
         current_player = state['current_player']

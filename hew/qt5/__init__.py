@@ -1,7 +1,7 @@
 import pkgutil
 import sys
 
-from PyQt5.QtCore import QSettings
+from PyQt5.QtCore import QSettings, QEvent
 from PyQt5.QtGui import QFont, QFontMetrics, QPixmap, QIcon, QImage
 from PyQt5.QtWidgets import QApplication
 
@@ -33,6 +33,16 @@ def app():
     icon = QIcon(pixmap)
     a.setWindowIcon(icon)
     return a
+
+
+@scheme
+def monkeypatch_app(app, save_settings):
+    def event(self, e):
+        # save_settings on quit
+        if e.type() == QEvent.Close:
+            save_settings()
+        return super(app.__class__, self).event(e)
+    app.event = event.__get__(app, QApplication)
 
 
 @scheme
