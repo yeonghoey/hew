@@ -6,7 +6,6 @@ import moviepy.audio.fx.all as afx
 from moviepy.editor import AudioFileClip, VideoFileClip
 import pysrt
 from pytube import YouTube
-import speech_recognition as sr
 
 from hew.util import parse_timedelta, Scheme, tempfile_path, tempdir_path
 
@@ -146,21 +145,3 @@ def subtitles(source_path):
         return pysrt.open(path)
     else:
         return None
-
-
-@scheme
-def recognize_hewn(state):
-    def f(path):
-        mp3 = AudioFileClip(path)
-        wav_path = tempfile_path('.wav')
-        mp3.write_audiofile(wav_path)
-
-        r = sr.Recognizer()
-        with sr.AudioFile(wav_path) as source:
-            audio = r.record(source)
-            try:
-                return r.recognize_google_cloud(audio)
-            except Exception as exc:
-                click.secho(str(exc), fg='red')
-                return ''
-    return f

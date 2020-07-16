@@ -188,7 +188,7 @@ def dump_srt(state,
 
 @scheme
 def dump_recognized(state,
-                    recognize_hewn,
+                    recognize_speech,
                     clip,
                     show_action):
 
@@ -197,7 +197,7 @@ def dump_recognized(state,
         if not path:
             return
 
-        transcript = recognize_hewn(path)
+        transcript = recognize_speech(path)
         clip(transcript.strip())
         show_action('dump-recognized')
     return f

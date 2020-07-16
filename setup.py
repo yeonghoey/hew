@@ -36,7 +36,7 @@ setup(
 
     install_requires=[
         'Click==6.7',
-        'google-api-python-client==1.6.4',
+        'google-cloud-speech==1.3.2',
         'moviepy==1.0.3',
         'pyperclip==1.6.0',
         'PyQt5==5.10',
@@ -44,7 +44,6 @@ setup(
         'python-vlc==3.0.102',
         'pytimeparse==1.1.7',
         'pytube3>=9.5.0',
-        'SpeechRecognition==3.8.1',
     ],
 
     classifiers=[

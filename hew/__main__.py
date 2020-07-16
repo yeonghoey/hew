@@ -4,6 +4,7 @@ import click
 
 import hew.action
 import hew.core
+import hew.stt
 import hew.qt5
 import hew.vlc
 
@@ -47,6 +48,7 @@ def cli(anki,
 
     scheme = Scheme(hew.action.scheme,
                     hew.core.scheme,
+                    hew.stt.scheme,
                     hew.qt5.scheme,
                     hew.vlc.scheme)
 
