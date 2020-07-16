@@ -204,6 +204,19 @@ def dump_recognized(state,
 
 
 @scheme
+def dump_primary(subtitles, dump_srt, dump_recognized):
+    # NOTE: if subtitles exist, dump_srt should be primary
+    return (dump_srt if subtitles is not None else
+            dump_recognized)
+
+
+@scheme
+def dump_secondary(subtitles, dump_primary, dump_srt, dump_recognized):
+    assert dump_primary in (dump_srt, dump_recognized)
+    return (dump_recognized if dump_primary == dump_srt else dump_srt)
+
+
+@scheme
 def play_hewn(main_vlc, sub_vlc, sub_view, state, set_current_player, show_action, right_duration):
     def f(side=None):
         path = state['last_hewn_path']

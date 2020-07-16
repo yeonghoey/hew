@@ -97,14 +97,13 @@ def shortcut_toggle_try_video(shortcut, video, state, try_video_label, try_video
 
 
 @ scheme
-def shortcut_dump_srt(shortcut, dump_srt):
-    return shortcut(['d', 'ㅇ'], dump_srt)
+def shortcut_dump_primary(shortcut, dump_primary):
+    return shortcut(['d', 'ㅇ'], dump_primary)
 
 
 @ scheme
-def shortcut_dump_recognized(shortcut, dump_recognized):
-    return shortcut(['Shift+d', 'Shift+ㅇ'],
-                    dump_recognized)
+def shortcut_dump_secondary(shortcut, dump_secondary):
+    return shortcut(['Shift+d', 'Shift+ㅇ'], dump_secondary)
 
 
 @ scheme
