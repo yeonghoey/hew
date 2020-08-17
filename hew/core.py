@@ -7,7 +7,7 @@ from moviepy.editor import AudioFileClip, VideoFileClip
 import pysrt
 from pytube import YouTube
 
-from hew.util import parse_timedelta, Scheme, tempfile_path, tempdir_path
+from hew.util import parse_timedelta, Scheme, tempfile_path, tempdir_path, downloads_path
 
 
 scheme = Scheme()
@@ -30,7 +30,7 @@ def source_path(youtube, yt_itag, yt_lang, source):
     if youtube is None:
         return source
 
-    dir_ = tempdir_path()
+    dir_ = downloads_path()
     stream = youtube.streams.get_by_itag(yt_itag)
 
     video_name = stream.default_filename

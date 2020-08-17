@@ -1,6 +1,7 @@
 import hashlib
 from inspect import getargspec
 import os
+from pathlib import Path
 import re
 import tempfile
 
@@ -91,6 +92,10 @@ def tempfile_path(ext, dir=None):
 
 def tempdir_path():
     return tempfile.mkdtemp()
+
+
+def downloads_path():
+    return str(Path.home() / 'Downloads')
 
 
 def sha1of(filepath):
