@@ -135,6 +135,7 @@ def state(video):
         'try_video': video is not None,  # Toggle with Tab
         'current_player': 'main',  # main or sub
         'current_target': 'anki',  # anki or downloads
+        'before_bookmark': None,
     }
 
 

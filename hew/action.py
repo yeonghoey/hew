@@ -416,11 +416,11 @@ def resize(screen, window, main_view, sub_view, video, state):
     return f
 
 
-BOOKMARK_EPSILON = 1.0
+BOOKMARK_EPSILON = 2.0
 
 
 @scheme
-def prev_bookmark(main_vlc, bookmarks, clamp, show_action):
+def prev_bookmark(main_vlc, bookmarks, state, clamp, show_action):
     def f():
         if bookmarks is None:
             return
@@ -430,13 +430,16 @@ def prev_bookmark(main_vlc, bookmarks, clamp, show_action):
             if s + BOOKMARK_EPSILON > current:
                 break
             prev_s = s
+        # Only keep before_bookmark when current not in bookmarks
+        if all(map(lambda s: abs(current - s) > BOOKMARK_EPSILON, bookmarks)):
+            state['before_bookmark'] = current
         main_vlc.set_time(clamp(int(prev_s * 1000)))
         show_action('prev_bookmark')
     return f
 
 
 @scheme
-def next_bookmark(main_vlc, bookmarks, clamp, show_action):
+def next_bookmark(main_vlc, bookmarks, state, clamp, show_action):
     def f():
         if bookmarks is None:
             return
@@ -446,8 +449,22 @@ def next_bookmark(main_vlc, bookmarks, clamp, show_action):
             if s - BOOKMARK_EPSILON < current:
                 break
             next_s = s
+        # Only keep before_bookmark when current not in bookmarks
+        if all(map(lambda s: abs(current - s) > BOOKMARK_EPSILON, bookmarks)):
+            state['before_bookmark'] = current
         main_vlc.set_time(clamp(int(next_s * 1000)))
         show_action('next_bookmark')
+    return f
+
+
+@scheme
+def return_before_bookmark(main_vlc, state, clamp, show_action):
+    def f():
+        before_bookmark = state['before_bookmark']
+        if before_bookmark is None:
+            return
+        main_vlc.set_time(clamp(int(before_bookmark * 1000)))
+        show_action('return_before_bookmark')
     return f
 
 

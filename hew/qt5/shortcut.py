@@ -41,7 +41,7 @@ def shortcut_set_main(shortcut, set_current_player):
                     lambda: set_current_player('main'))
 
 
-@ scheme
+@scheme
 def shortcut_seek(shortcut, seek):
     def add(keys, ms):
         return shortcut(keys, lambda: seek(ms))
@@ -53,7 +53,7 @@ def shortcut_seek(shortcut, seek):
     ]
 
 
-@ scheme
+@scheme
 def shortcut_mark(shortcut, mark, hew):
     def mark_left():
         mark('left')
@@ -68,7 +68,7 @@ def shortcut_mark(shortcut, mark, hew):
     )
 
 
-@ scheme
+@scheme
 def shortcut_adjust(shortcut, mark, adjust):
     def add(keys, side, ms):
         return shortcut(keys, lambda: adjust(side, ms))
@@ -81,49 +81,39 @@ def shortcut_adjust(shortcut, mark, adjust):
     ]
 
 
-@ scheme
+@scheme
 def shortcut_hew(shortcut, hew):
     return shortcut(['c', 'ㅊ'], hew)
 
 
-@ scheme
-def shortcut_toggle_try_video(shortcut, video, state, try_video_label, try_video_label_text):
-    def f():
-        try_video = (video is not None) and (not state['try_video'])
-        try_video_label.setText(try_video_label_text(try_video))
-        state['try_video'] = try_video
-
-    return shortcut(['Tab'], f)
-
-
-@ scheme
+@scheme
 def shortcut_dump_primary(shortcut, dump_primary):
     return shortcut(['d', 'ㅇ'], dump_primary)
 
 
-@ scheme
+@scheme
 def shortcut_dump_secondary(shortcut, dump_secondary):
     return shortcut(['Shift+d', 'Shift+ㅇ'], dump_secondary)
 
 
-@ scheme
+@scheme
 def shortcut_play_hewn_left(shortcut, play_hewn):
     return shortcut(['r', 'ㄱ'],
                     lambda: play_hewn('left'))
 
 
-@ scheme
+@scheme
 def shortcut_play_hewn_right(shortcut, play_hewn):
     return shortcut(['Shift+r', 'Shift+ㄱ'],
                     lambda: play_hewn('right'))
 
 
-@ scheme
+@scheme
 def shortcut_reload(shortcut, reload_):
     return shortcut([QKeySequence.Refresh], reload_)
 
 
-@ scheme
+@scheme
 def shortcut_scale(shortcut, resize):
 
     def add(keys, ratio, absolute=False):
@@ -136,12 +126,12 @@ def shortcut_scale(shortcut, resize):
     ]
 
 
-@ scheme
+@scheme
 def shortcut_take_snapshot(shortcut, take_snapshot):
     return shortcut([QKeySequence.Print], take_snapshot)
 
 
-@ scheme
+@scheme
 def shortcut_shift(shortcut, window):
     def shift(dx, dy):
         window.move(window.x() + dx, window.y() + dy)
@@ -158,14 +148,29 @@ def shortcut_shift(shortcut, window):
     ]
 
 
-@ scheme
+@scheme
+def shortcut_toggle_try_video(shortcut, video, state, try_video_label, try_video_label_text):
+    def f():
+        try_video = (video is not None) and (not state['try_video'])
+        try_video_label.setText(try_video_label_text(try_video))
+        state['try_video'] = try_video
+
+    return shortcut(['~'], f)
+
+
+@scheme
 def shortcut_toggle_current_target(shortcut, toggle_current_target):
-    return shortcut(['`', '₩'], toggle_current_target)
+    return shortcut(['Tab'], toggle_current_target)
 
 
-@ scheme
+@scheme
 def shortcut_cycle_subtitles(shortcut, cycle_subtitles):
-    return shortcut(['\\'], cycle_subtitles)
+    return shortcut(['`', '₩'], cycle_subtitles)
+
+
+@scheme
+def shortcut_return_before_bookmark(shortcut, return_before_bookmark):
+    return shortcut(['\\'], return_before_bookmark)
 
 
 @scheme
@@ -178,11 +183,11 @@ def shortcut_next_bookmark(shortcut, next_bookmark):
     return shortcut([']'], next_bookmark)
 
 
-@ scheme
+@scheme
 def shortcut_yank(shortcut, yank):
     return shortcut(['y', 'ㅛ'], yank)
 
 
-@ scheme
+@scheme
 def shortcut_yank_source(shortcut, yank_source):
     return shortcut(['Shift+y', 'Shift+ㅛ'], yank_source)
