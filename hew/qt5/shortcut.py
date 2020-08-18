@@ -155,7 +155,7 @@ def shortcut_toggle_try_video(shortcut, video, state, try_video_label, try_video
         try_video_label.setText(try_video_label_text(try_video))
         state['try_video'] = try_video
 
-    return shortcut(['~'], f)
+    return shortcut(['Shift+Tab'], f)
 
 
 @scheme
