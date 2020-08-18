@@ -4,20 +4,9 @@ import re
 from setuptools import find_packages, setup
 
 
-def extract_version(content):
-    m = re.search(r'__version__\s+=\s+(.*)', content)
-    s = m.group(1)
-    return str(ast.literal_eval(s))
-
-
-with open('hew/__init__.py', 'rb') as f:
-    content = f.read().decode('utf-8')
-
-VERSION = extract_version(content)
-
 setup(
     name='hew',
-    version=VERSION,
+    version='0.0.1',
     description='a tool for hewing media',
     keywords='video audio tool',
     url='https://github.com/yeonghoey/hew',
