@@ -416,6 +416,39 @@ def resize(screen, window, main_view, sub_view, video, state):
     return f
 
 
+BOOKMARK_EPSILON = 1.0
+
+
+@scheme
+def prev_bookmark(main_vlc, bookmarks, clamp, show_action):
+    def f():
+        if bookmarks is None:
+            return
+        current = main_vlc.get_time() / 1000
+        prev_s = current
+        for s in bookmarks:
+            if s + BOOKMARK_EPSILON > current:
+                break
+            prev_s = s
+        main_vlc.set_time(clamp(int(prev_s * 1000)))
+    return f
+
+
+@scheme
+def next_bookmark(main_vlc, bookmarks, clamp, show_action):
+    def f():
+        if bookmarks is None:
+            return
+        current = main_vlc.get_time() / 1000
+        next_s = current
+        for s in reversed(bookmarks):
+            if s - BOOKMARK_EPSILON < current:
+                break
+            next_s = s
+        main_vlc.set_time(clamp(int(next_s * 1000)))
+    return f
+
+
 @scheme
 def init_subtitles(main_view, main_vlc, state):
     # Init the subtitle settings as the initial value of the state.

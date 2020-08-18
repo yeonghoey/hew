@@ -16,6 +16,7 @@ DIR = click.Path(exists=True, file_okay=False, dir_okay=True)
 
 @click.command()
 @click.option('--anki-media', type=DIR, envvar='ANKI_MEDIA')
+@click.option('--bookmarks', default=None)
 @click.option('--video-no-sound', is_flag=True)
 @click.option('--video-no-resize', is_flag=True)
 @click.option('--yt', is_flag=True)
@@ -30,6 +31,7 @@ DIR = click.Path(exists=True, file_okay=False, dir_okay=True)
 @click.argument('source')
 @click.argument('start-at', default=None, required=False)
 def cli(anki_media,
+        bookmarks,
         video_no_sound,
         video_no_resize,
         yt,
@@ -55,8 +57,12 @@ def cli(anki_media,
         mapping = {'360p': 18, '720p': 22, '1080p': 37}
         yt_itag = mapping[yt_quality]
 
+    if bookmarks is not None:
+        bookmarks = sorted(map(int, bookmarks.split(',')))
+
     ctx = {
         'anki_media': anki_media,
+        'bookmarks': bookmarks,
         'video_no_sound': video_no_sound,
         'video_no_resize': video_no_resize,
         'yt': yt,

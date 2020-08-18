@@ -168,6 +168,16 @@ def shortcut_cycle_subtitles(shortcut, cycle_subtitles):
     return shortcut(['\\'], cycle_subtitles)
 
 
+@scheme
+def shortcut_prev_bookmark(shortcut, prev_bookmark):
+    return shortcut(['['], prev_bookmark)
+
+
+@scheme
+def shortcut_next_bookmark(shortcut, next_bookmark):
+    return shortcut([']'], next_bookmark)
+
+
 @ scheme
 def shortcut_yank(shortcut, yank):
     return shortcut(['y', 'ㅛ'], yank)
