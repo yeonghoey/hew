@@ -1,3 +1,4 @@
+import os
 import sys
 
 import click
@@ -8,7 +9,7 @@ import hew.stt
 import hew.qt5
 import hew.vlc
 
-from hew.util import Scheme
+from hew.util import Scheme, downloads_path
 
 
 DIR = click.Path(exists=True, file_okay=False, dir_okay=True)
@@ -45,6 +46,10 @@ def cli(anki_media,
         vlc_quiet,
         source,
         start_at):
+
+    # NOTE: FFMPEG creates some temporary files in CWD when generating new files.
+    # To make sure the process has persmission to write in CWD, just change CWD to ~/Downloads
+    os.chdir(downloads_path())
 
     scheme = Scheme(hew.action.scheme,
                     hew.core.scheme,
