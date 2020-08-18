@@ -61,6 +61,7 @@ class Window(DraggingMixin, QWidget):
 def window(app, main_view, sub_view, layout, screen):
     window = Window(main_view, sub_view)
     window.setFixedWidth(960)
+    window.setFixedHeight(200)
     window.setLayout(layout)
     window.show()
     window.activateWindow()
@@ -119,9 +120,13 @@ def sub_view(app, video):
 @scheme
 def layout(app, indicator_layout, slider_layout, clipbox):
     layout = QVBoxLayout()
+    layout.addStretch(1)
     layout.addLayout(indicator_layout)
+    layout.addStretch(1)
     layout.addLayout(slider_layout)
+    layout.addStretch(1)
     layout.addWidget(clipbox)
+    layout.addStretch(1)
     return layout
 
 
@@ -152,8 +157,6 @@ def indicator_layout(app,
 
     right = QVBoxLayout()
     right.addWidget(current_player_label, alignment=Qt.AlignRight)
-    # right.addWidget(current_target_label)
-    # right.addWidget(try_video_label)
     rbottom = QHBoxLayout()
     rbottom.addStretch(1)
     rbottom.addWidget(current_target_label)
@@ -214,8 +217,10 @@ def try_video_label_text():
 @scheme
 def slider_layout(app, time_labels_layout, slider):
     layout = QVBoxLayout()
+    layout.addStretch(1)
     layout.addLayout(time_labels_layout)
     layout.addWidget(slider)
+    layout.addStretch(1)
     return layout
 
 
@@ -267,8 +272,7 @@ def slider(app, duration, current_time_label, set_position):
 def clipbox(app, font_metrics):
     text = QPlainTextEdit()
     text.setReadOnly(True)
-    # FIXME: Hard coded 8 lines for the height,is there a better way?
-    text.setFixedHeight(font_metrics.lineSpacing() * 8)
+    text.setFixedHeight(font_metrics.lineSpacing() * 2)
     return text
 
 
