@@ -15,7 +15,6 @@ DIR = click.Path(exists=True, file_okay=False, dir_okay=True)
 
 
 @click.command()
-@click.option('--anki', is_flag=True)
 @click.option('--anki-media', type=DIR, envvar='ANKI_MEDIA')
 @click.option('--video-no-sound', is_flag=True)
 @click.option('--video-no-resize', is_flag=True)
@@ -30,8 +29,7 @@ DIR = click.Path(exists=True, file_okay=False, dir_okay=True)
 @click.option('--vlc-quiet/--vlc-no-quiet', default=True)
 @click.argument('source')
 @click.argument('start-at', default=None, required=False)
-def cli(anki,
-        anki_media,
+def cli(anki_media,
         video_no_sound,
         video_no_resize,
         yt,
@@ -58,7 +56,6 @@ def cli(anki,
         yt_itag = mapping[yt_quality]
 
     ctx = {
-        'anki': anki,
         'anki_media': anki_media,
         'video_no_sound': video_no_sound,
         'video_no_resize': video_no_resize,

@@ -159,8 +159,13 @@ def shortcut_shift(shortcut, window):
 
 
 @ scheme
+def shortcut_toggle_current_target(shortcut, toggle_current_target):
+    return shortcut(['`', '₩'], toggle_current_target)
+
+
+@ scheme
 def shortcut_cycle_subtitles(shortcut, cycle_subtitles):
-    return shortcut(['`', '₩'], cycle_subtitles)
+    return shortcut(['Ctrl+\\'], cycle_subtitles)
 
 
 @ scheme

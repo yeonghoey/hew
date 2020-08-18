@@ -130,6 +130,7 @@ def indicator_layout(app,
                      title_label,
                      mark_label,
                      current_player_label,
+                     current_target_label,
                      try_video_label,
                      action_label,
                      font_metrics):
@@ -138,21 +139,27 @@ def indicator_layout(app,
 
     left = QVBoxLayout()
     left.addWidget(title_label)
-    layout.addLayout(left, stretch=1)
+    layout.addLayout(left, stretch=2)
 
     layout.addSpacing(font_metrics.width('mm'))
 
     mid = QVBoxLayout()
     mid.addWidget(action_label, alignment=Qt.AlignLeft)
     mid.addWidget(mark_label, alignment=Qt.AlignLeft)
-    layout.addLayout(mid, stretch=1)
+    layout.addLayout(mid, stretch=2)
 
     layout.addSpacing(font_metrics.width('mm'))
 
     right = QVBoxLayout()
-    right.addWidget(current_player_label)
-    right.addWidget(try_video_label)
-    layout.addLayout(right, stretch=0)
+    right.addWidget(current_player_label, alignment=Qt.AlignRight)
+    # right.addWidget(current_target_label)
+    # right.addWidget(try_video_label)
+    rbottom = QHBoxLayout()
+    rbottom.addStretch(1)
+    rbottom.addWidget(current_target_label)
+    rbottom.addWidget(try_video_label)
+    right.addLayout(rbottom)
+    layout.addLayout(right, stretch=1)
 
     return layout
 
@@ -178,6 +185,13 @@ def mark_label(app, font_metrics):
 @scheme
 def current_player_label(app, state):
     t = state['current_player']
+    label = QLabel(t)
+    return label
+
+
+@scheme
+def current_target_label(app, state):
+    t = state['current_target']
     label = QLabel(t)
     return label
 

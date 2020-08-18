@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import os
 import shutil
 
@@ -6,7 +7,7 @@ import pyperclip
 
 from hew.util import (
     format_timedelta, format_timedelta_range, remove_tags, Scheme,
-    tempfile_path, sha1of)
+    tempfile_path, downloads_path, sha1of)
 
 
 scheme = Scheme()
@@ -83,8 +84,7 @@ def adjust(state, clamp, show_action, update_mark):
 @scheme
 def hew(main_vlc,
         sub_vlc,
-        anki,
-        anki_media,
+        get_current_target_path,
         video_no_sound,
         video_no_resize,
         main_view,
@@ -94,7 +94,7 @@ def hew(main_vlc,
         dump_media,
         play_hewn):
 
-    dirname = anki_media if anki else '.'
+    dirname = get_current_target_path()
 
     def f():
         left = state['left']
@@ -339,6 +339,37 @@ def set_current_player(state, current_player_label, main_vlc, main_view, sub_vlc
         state['current_player'] = s
         current_player_label.setText(s)
 
+    return f
+
+
+@scheme
+def target_paths(anki_media):
+    return {
+        'anki': anki_media,
+        'downloads': downloads_path(),
+    }
+
+
+@scheme
+def set_current_target(state, current_target_label):
+    def f(target):
+        current_target_label.setText(target)
+        state['current_target'] = target
+    return f
+
+
+@scheme
+def toggle_current_target(state, set_current_target):
+    def f():
+        t = state['current_target']
+        set_current_target('downloads' if t == 'anki' else 'anki')
+    return f
+
+
+@scheme
+def get_current_target_path(state, target_paths):
+    def f():
+        return target_paths[state['current_target']]
     return f
 
 
