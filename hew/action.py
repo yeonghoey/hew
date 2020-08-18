@@ -94,9 +94,8 @@ def hew(main_vlc,
         dump_media,
         play_hewn):
 
-    dirname = get_current_target_path()
-
     def f():
+        dirname = get_current_target_path()
         left = state['left']
         right = state['right']
         if left >= right:
