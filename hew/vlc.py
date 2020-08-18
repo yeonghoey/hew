@@ -1,3 +1,5 @@
+import time
+
 import vlc
 
 from hew.util import Scheme
@@ -27,6 +29,9 @@ def main_vlc(vlc_instance,
         p.set_nsobject(nsview)
     p.play()
     p.set_time(start_at_ms)
+    # Wait until the video starts
+    while not p.is_playing():
+        time.sleep(0.1)
     return p
 
 

@@ -165,7 +165,7 @@ def shortcut_toggle_current_target(shortcut, toggle_current_target):
 
 @ scheme
 def shortcut_cycle_subtitles(shortcut, cycle_subtitles):
-    return shortcut(['Ctrl+\\'], cycle_subtitles)
+    return shortcut(['\\'], cycle_subtitles)
 
 
 @ scheme

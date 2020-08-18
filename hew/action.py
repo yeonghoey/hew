@@ -417,7 +417,15 @@ def resize(screen, window, main_view, sub_view, video, state):
 
 
 @scheme
-def cycle_subtitles(main_view, main_vlc, state, show_action):
+def init_subtitles(main_view, main_vlc, state):
+    # Init the subtitle settings as the initial value of the state.
+    main_vlc.video_set_spu(state['next_spu'])
+    state['next_spu'] += 1
+    return None
+
+
+@scheme
+def cycle_subtitles(main_view, main_vlc, state, init_subtitles, show_action):
     def f():
         count = main_vlc.video_get_spu_count()
         if count <= 0:
