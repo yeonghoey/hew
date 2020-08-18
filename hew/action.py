@@ -431,6 +431,7 @@ def prev_bookmark(main_vlc, bookmarks, clamp, show_action):
                 break
             prev_s = s
         main_vlc.set_time(clamp(int(prev_s * 1000)))
+        show_action('prev_bookmark')
     return f
 
 
@@ -446,6 +447,7 @@ def next_bookmark(main_vlc, bookmarks, clamp, show_action):
                 break
             next_s = s
         main_vlc.set_time(clamp(int(next_s * 1000)))
+        show_action('next_bookmark')
     return f
 
 
