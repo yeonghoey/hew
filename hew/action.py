@@ -446,9 +446,9 @@ def prev_bookmark(main_vlc, bookmarks, state, clamp, show_action):
             if s + BOOKMARK_EPSILON > current:
                 break
             prev_s = s
-        # Only keep before_bookmark when current not in bookmarks
+        # Only keep before_jump when current not in bookmarks
         if all(map(lambda s: abs(current - s) > BOOKMARK_EPSILON, bookmarks)):
-            state['before_bookmark'] = current
+            state['before_jump'] = current
         main_vlc.set_time(clamp(int(prev_s * 1000)))
         show_action('prev_bookmark')
     return f
@@ -465,22 +465,34 @@ def next_bookmark(main_vlc, bookmarks, state, clamp, show_action):
             if s - BOOKMARK_EPSILON < current:
                 break
             next_s = s
-        # Only keep before_bookmark when current not in bookmarks
+        # Only keep before_jump when current not in bookmarks
         if all(map(lambda s: abs(current - s) > BOOKMARK_EPSILON, bookmarks)):
-            state['before_bookmark'] = current
+            state['before_jump'] = current
         main_vlc.set_time(clamp(int(next_s * 1000)))
         show_action('next_bookmark')
     return f
 
 
 @scheme
-def return_before_bookmark(main_vlc, state, clamp, show_action):
+def return_before_jump(main_vlc, state, clamp, show_action):
     def f():
-        before_bookmark = state['before_bookmark']
-        if before_bookmark is None:
+        before_jump = state['before_jump']
+        if before_jump is None:
             return
-        main_vlc.set_time(clamp(int(before_bookmark * 1000)))
-        show_action('return_before_bookmark')
+        main_vlc.set_time(clamp(int(before_jump * 1000)))
+        show_action('return_before_jump')
+    return f
+
+
+@scheme
+def move_to_start(main_vlc, state, show_action):
+    def f():
+        current = main_vlc.get_time() / 1000
+        if current < BOOKMARK_EPSILON:
+            return
+        state['before_jump'] = current
+        main_vlc.set_time(0)
+        show_action('move_to_start')
     return f
 
 

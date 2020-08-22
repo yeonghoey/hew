@@ -169,8 +169,13 @@ def shortcut_cycle_subtitles(shortcut, cycle_subtitles):
 
 
 @scheme
-def shortcut_return_before_bookmark(shortcut, return_before_bookmark):
-    return shortcut(['\\'], return_before_bookmark)
+def shortcut_return_before_jump(shortcut, return_before_jump):
+    return shortcut(['\\'], return_before_jump)
+
+
+@scheme
+def shortcut_move_to_start(shortcut, move_to_start):
+    return shortcut(['0'], move_to_start)
 
 
 @scheme
