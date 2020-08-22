@@ -128,7 +128,7 @@ def shortcut_scale(shortcut, resize):
 
 @scheme
 def shortcut_take_snapshot(shortcut, take_snapshot):
-    return shortcut([QKeySequence.Print], take_snapshot)
+    return shortcut([QKeySequence.Print, '4', 'y', 'ㅛ'], take_snapshot)
 
 
 @scheme
@@ -186,11 +186,6 @@ def shortcut_prev_bookmark(shortcut, prev_bookmark):
 @scheme
 def shortcut_next_bookmark(shortcut, next_bookmark):
     return shortcut([']'], next_bookmark)
-
-
-@scheme
-def shortcut_yank(shortcut, yank):
-    return shortcut(['y', 'ㅛ'], yank)
 
 
 @scheme

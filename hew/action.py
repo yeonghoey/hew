@@ -530,15 +530,6 @@ def cycle_subtitles(main_view, main_vlc, state, init_subtitles, show_action):
 
 
 @scheme
-def yank(clipbox, show_action):
-    def f():
-        s = clipbox.toPlainText()
-        pyperclip.copy(s)
-        show_action('yank')
-    return f
-
-
-@scheme
 def yank_source(youtube, source, source_path, clip, show_action):
     def f():
         if youtube is None:
