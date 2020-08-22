@@ -91,8 +91,8 @@ def hew(main_vlc,
         video,
         audio,
         state,
-        dump_anki,
-        dump_downloads,
+        clip_anki,
+        clip_downloads,
         play_hewn):
 
     def f():
@@ -122,9 +122,9 @@ def hew(main_vlc,
             filepath = os.path.join(dirname, filename)
             shutil.move(temppath, filepath)
             if state['current_target'] == 'anki':
-                dump_anki(filename)
+                clip_anki(filename)
             else:
-                dump_downloads(filepath)
+                clip_downloads(filepath)
         else:
             hewn = subclip(audio, left, right)
             temppath = tempfile_path('.mp3')
@@ -133,9 +133,9 @@ def hew(main_vlc,
             filepath = os.path.join(dirname, filename)
             shutil.move(temppath, filepath)
             if state['current_target'] == 'anki':
-                dump_anki(filename)
+                clip_anki(filename)
             else:
-                dump_downloads(filepath)
+                clip_downloads(filepath)
 
         state['last_hewn_path'] = filepath
         state['last_left'] = left
@@ -156,20 +156,20 @@ def subclip(clip, left, right):
 
 
 @scheme
-def dump_anki(clip, show_action):
+def clip_anki(clip, show_action):
     def f(filename):
         sound_str = '[sound:%s]' % filename
         clip(sound_str)
-        show_action('dump-anki')
+        show_action('clip-anki')
 
     return f
 
 
 @scheme
-def dump_downloads(clip, show_action):
+def clip_downloads(clip, show_action):
     def f(filepath):
         clip(filepath)
-        show_action('dump-downloads')
+        show_action('clip-downloads')
 
     return f
 
