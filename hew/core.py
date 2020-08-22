@@ -122,13 +122,3 @@ def state(video):
         'current_target': 'anki',  # anki or downloads
         'before_jump': None,
     }
-
-
-@scheme
-def subtitles(source_path):
-    path = os.path.splitext(source_path)[0] + '.srt'
-    if os.path.exists(path):
-        click.secho("SRT: '%s'" % path, fg='yellow')
-        return pysrt.open(path)
-    else:
-        return None

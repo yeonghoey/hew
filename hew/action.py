@@ -1,9 +1,14 @@
 from collections import OrderedDict
+from io import StringIO
 import os
+from pathlib import Path
 import shutil
 
 import moviepy.audio.fx.all as afx
+from moviepy.editor import CompositeVideoClip, TextClip
+from moviepy.video.tools.subtitles import SubtitlesClip
 import pyperclip
+import pysrt
 
 from hew.util import (
     format_timedelta, format_timedelta_range, remove_tags, Scheme,
@@ -91,6 +96,8 @@ def hew(main_vlc,
         video,
         audio,
         state,
+        subtitles_map,
+        srt_padding,
         clip_anki,
         clip_downloads,
         play_hewn):
@@ -112,6 +119,29 @@ def hew(main_vlc,
                 # ffmpeg requires sizes to be even
                 w, h = (w//2)*2, (h//2)*2
                 ffmpeg_params.extend(['-vf', 'scale=%s:%s' % (w, h)])
+            spu, spec = subtitles_map.current()
+            if spu != -1:
+                _, srt = spec
+                subsrt_path = subsrt(srt, left, right, srt_padding)
+                if subsrt_path is not None:
+                    # NOTE: Placing subtitles is tricky.
+                    # TextClip determines the base size, but there is no way to specify the base position.
+                    # There's one other concept, caption and align, affects the vertical position.
+                    # In the meantime, SubtitlesClip determine the whole base position.
+                    # align='South' and set_position=('center', 'top') will place at the bottom
+                    # of the video, as expected.
+                    def make_textclip(txt):
+                        w, h = hewn.size
+                        size = (int(w*0.8), int(h*0.95))
+                        return TextClip(txt, size=size,
+                                        method='caption', align='South',
+                                        font='ArialUnicode', fontsize=36, color='white')
+                    subsrtclip = SubtitlesClip(subsrt_path, make_textclip)
+                    print('subsrt', subsrtclip)
+
+                    hewn = CompositeVideoClip(
+                        [hewn, subsrtclip.set_position(("center", "top"))])
+
             # Codecs chosen for HTML5
             hewn.write_videofile(temppath,
                                  codec='libx264',
@@ -155,6 +185,27 @@ def subclip(clip, left, right):
     )
 
 
+def subsrt(srt, left, right, srt_padding):
+    sliced = srt.slice(starts_after=left - srt_padding,
+                       ends_before=right + srt_padding)
+    if not sliced:
+        return None
+
+    # NOTE: The result of slice still references srt items in
+    # the original srt. There seems no way a way to deep copy,
+    # So export as a text and recreate from it.
+    buf = StringIO()
+    sliced.write_into(buf)
+    ss = pysrt.from_string(buf.getvalue())
+
+    # Do some modifications on it.
+    ss.clean_indexes()
+    ss.shift(milliseconds=-left)
+    path = tempfile_path('.srt')
+    ss.save(path, encoding='utf-8')
+    return path
+
+
 @scheme
 def clip_anki(clip, show_action):
     def f(filename):
@@ -176,24 +227,25 @@ def clip_downloads(clip, show_action):
 
 @scheme
 def dump_srt(state,
-             subtitles,
+             subtitles_map,
              srt_padding,
              clip,
              show_action):
 
     def f():
-        if not subtitles:
+        path = state['last_hewn_path']
+        if not path:
             return
 
-        path = state['last_hewn_path']
-
-        if not path:
+        spu, spec = subtitles_map.current()
+        _, srt = spec
+        if srt is None:
             return
 
         left = state['left']
         right = state['right']
-        ss = subtitles.slice(starts_after=left - srt_padding,
-                             ends_before=right + srt_padding)
+        ss = srt.slice(starts_after=left - srt_padding,
+                       ends_before=right + srt_padding)
         transcript = ' '.join(remove_tags(s.text) for s in ss)
         clip(transcript.strip())
         show_action('dump-srt')
@@ -219,14 +271,14 @@ def dump_recognized(state,
 
 
 @scheme
-def dump_primary(subtitles, dump_srt, dump_recognized):
+def dump_primary(subtitles_map, dump_srt, dump_recognized):
     # NOTE: if subtitles exist, dump_srt should be primary
-    return (dump_srt if subtitles is not None else
+    return (dump_srt if subtitles_map.is_loaded() else
             dump_recognized)
 
 
 @scheme
-def dump_secondary(subtitles, dump_primary, dump_srt, dump_recognized):
+def dump_secondary(subtitles_map, dump_primary, dump_srt, dump_recognized):
     assert dump_primary in (dump_srt, dump_recognized)
     return (dump_recognized if dump_primary == dump_srt else dump_srt)
 
@@ -314,12 +366,16 @@ def take_snapshot(state,
 
 
 @scheme
-def reload_(main_vlc, main_path, set_current_player, show_action):
+def reload_(main_vlc, main_path, set_current_player, subtitles_map, show_action):
     def f():
         ms = main_vlc.get_time()
         main_vlc.set_mrl(main_path)
         main_vlc.play()
         main_vlc.set_time(ms)
+
+        spu, _ = subtitles_map.current()
+        main_vlc.video_set_spu(spu)
+
         set_current_player('main')
         show_action('reload')
     return f
@@ -504,8 +560,8 @@ def toggle_subtitles(main_view, main_vlc, subtitles_map, show_action):
 
     def f():
         subtitles_map.enabled = not subtitles_map.enabled
-        spu, info = subtitles_map.current()
-        name, _ = info
+        spu, spec = subtitles_map.current()
+        name, _ = spec
         main_vlc.video_set_spu(spu)
         status = 'enabled' if subtitles_map.enabled else 'disabled'
         show_action(f'subtitles({status}): {name}')
@@ -516,8 +572,8 @@ def toggle_subtitles(main_view, main_vlc, subtitles_map, show_action):
 def cycle_subtitles(main_view, main_vlc, subtitles_map, show_action, toggle_subtitles):
     def f():
         subtitles_map.cycle()
-        spu, info = subtitles_map.current()
-        name, _ = info
+        spu, spec = subtitles_map.current()
+        name, _ = spec
         main_vlc.video_set_spu(spu)
         status = 'enabled' if subtitles_map.enabled else 'disabled'
         show_action(f'subtitles({status}): {name}')
