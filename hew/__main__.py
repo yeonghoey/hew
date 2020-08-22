@@ -8,6 +8,7 @@ import hew.core
 import hew.stt
 import hew.qt5
 import hew.vlc
+import hew.subtitles
 
 from hew.util import Scheme, downloads_path
 
@@ -23,7 +24,6 @@ DIR = click.Path(exists=True, file_okay=False, dir_okay=True)
 @click.option('--yt', is_flag=True)
 @click.option('--yt-quality', default='720p', help='one of 360p, 720p, 1080p')
 @click.option('--yt-itag', default=None, type=int, help='overrides yt-quality')
-@click.option('--yt-lang', default='en', help='for caption, such as "en"')
 @click.option('--right-duration', type=int, default=1000)
 @click.option('--convert-wav', is_flag=True)
 @click.option('--snapshot-dir', type=DIR)
@@ -38,7 +38,6 @@ def cli(anki_media,
         yt,
         yt_quality,
         yt_itag,
-        yt_lang,
         right_duration,
         convert_wav,
         snapshot_dir,
@@ -55,7 +54,8 @@ def cli(anki_media,
                     hew.core.scheme,
                     hew.stt.scheme,
                     hew.qt5.scheme,
-                    hew.vlc.scheme)
+                    hew.vlc.scheme,
+                    hew.subtitles.scheme)
 
     if yt_itag is None:
         # https://gist.github.com/sidneys/7095afe4da4ae58694d128b1034e01e2
@@ -72,7 +72,6 @@ def cli(anki_media,
         'video_no_resize': video_no_resize,
         'yt': yt,
         'yt_itag': yt_itag,
-        'yt_lang': yt_lang,
         'right_duration': right_duration,
         'convert_wav': convert_wav,
         'snapshot_dir': snapshot_dir,

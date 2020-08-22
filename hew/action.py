@@ -497,34 +497,30 @@ def move_to_start(main_vlc, state, show_action):
 
 
 @scheme
-def init_subtitles(main_view, main_vlc, state):
-    # Init the subtitle settings as the initial value of the state.
-    main_vlc.video_set_spu(state['next_spu'])
-    state['next_spu'] += 1
-    return None
+def toggle_subtitles(main_view, main_vlc, subtitles_map, show_action):
+    # Disable by default
+    subtitles_map.enabled = False
+    main_vlc.video_set_spu(-1)
+
+    def f():
+        subtitles_map.enabled = not subtitles_map.enabled
+        spu, info = subtitles_map.current()
+        name, _ = info
+        main_vlc.video_set_spu(spu)
+        status = 'enabled' if subtitles_map.enabled else 'disabled'
+        show_action(f'subtitles({status}): {name}')
+    return f
 
 
 @scheme
-def cycle_subtitles(main_view, main_vlc, state, init_subtitles, show_action):
+def cycle_subtitles(main_view, main_vlc, subtitles_map, show_action, toggle_subtitles):
     def f():
-        count = main_vlc.video_get_spu_count()
-        if count <= 0:
-            return
-
-        # video_get_spu() work in a weird way,
-        # so maintain the next spu manually.
-        nxt = state['next_spu']
-        ret = -1
-        while ret != 0:
-            ret = main_vlc.video_set_spu(nxt)
-            if ret == 0:
-                show_action('subtitles %d' % nxt)
-            # How spu number is determined is not documented.
-            # So just based on self experiments:
-            # cycle: -1 <= spu <= get_spu_count()
-            nxt = nxt + 1
-            nxt = nxt if nxt <= count else -1
-        state['next_spu'] = nxt
+        subtitles_map.cycle()
+        spu, info = subtitles_map.current()
+        name, _ = info
+        main_vlc.video_set_spu(spu)
+        status = 'enabled' if subtitles_map.enabled else 'disabled'
+        show_action(f'subtitles({status}): {name}')
 
     return f
 

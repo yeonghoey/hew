@@ -83,7 +83,7 @@ def shortcut_adjust(shortcut, mark, adjust):
 
 @scheme
 def shortcut_hew(shortcut, hew):
-    return shortcut(['c', 'ㅊ'], hew)
+    return shortcut(['h', 'ㅗ'], hew)
 
 
 @scheme
@@ -164,8 +164,13 @@ def shortcut_toggle_current_target(shortcut, toggle_current_target):
 
 
 @scheme
+def shortcut_toggle_subtitles(shortcut, toggle_subtitles):
+    return shortcut(['c', 'ㅊ'], toggle_subtitles)
+
+
+@scheme
 def shortcut_cycle_subtitles(shortcut, cycle_subtitles):
-    return shortcut(['`', '₩'], cycle_subtitles)
+    return shortcut(['Shift+c', 'Shift+ㅊ'], cycle_subtitles)
 
 
 @scheme

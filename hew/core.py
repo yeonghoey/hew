@@ -26,7 +26,7 @@ def youtube(yt, source):
 
 
 @scheme
-def source_path(youtube, yt_itag, yt_lang, source):
+def source_path(youtube, yt_itag, source):
     if youtube is None:
         return source
 
@@ -38,25 +38,11 @@ def source_path(youtube, yt_itag, yt_lang, source):
 
     click.secho("Download: '%s'" % (video_path), fg='yellow')
     stream.download(output_path=dir_)
-
-    caption = youtube.captions.get_by_language_code(yt_lang)
-    if caption is not None:
-        name, _ = os.path.splitext(video_name)
-        caption_name = '%s.srt' % name
-        caption_path = os.path.join(dir_, caption_name)
-        click.secho("Download: '%s'" % caption_path, fg='yellow')
-        with open(caption_path, 'w') as f:
-            try:
-                f.write(caption.generate_srt_captions())
-            except Exception as exc:
-                click.secho("Failed to download srt: '%s'" % str(exc),
-                            fg='red')
-
     return video_path
 
 
 @scheme
-def main_path(source_path, convert_wav):
+def main_path(source_path, download_yt_captions, convert_wav):
     if convert_wav:
         src = AudioFileClip(source_path)
         filename = os.path.basename(source_path)
@@ -131,7 +117,6 @@ def state(video):
         'last_hewn_path': '',
         'last_hewn-side': 'left',
         'scale': 1.,
-        'next_spu': -1,  # Disabled
         'try_video': video is not None,  # Toggle with Tab
         'current_player': 'main',  # main or sub
         'current_target': 'anki',  # anki or downloads
