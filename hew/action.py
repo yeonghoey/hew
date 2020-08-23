@@ -396,16 +396,21 @@ def show_action(action_label):
 
 
 @scheme
-def set_current_player(state, current_player_label, main_vlc, main_view, sub_vlc, sub_view, slider):
+def set_current_player(state, current_player_label, main_vlc, main_view, sub_vlc, sub_view, slider,
+                       label_style_normal, label_style_notice):
     def f(s):
         assert s == 'main' or s == 'sub'
+
         if s == 'main':
             sub_vlc.stop()
             sub_view.hide()
             slider.setEnabled(True)
+            label_style_normal(current_player_label)
+
         if s == 'sub':
             main_vlc.set_pause(1)
             slider.setEnabled(False)
+            label_style_notice(current_player_label)
 
         state['current_player'] = s
         current_player_label.setText(s)
@@ -422,8 +427,13 @@ def target_paths(anki_media):
 
 
 @scheme
-def set_current_target(state, current_target_label):
+def set_current_target(state, current_target_label, label_style_color):
     def f(target):
+        if target == 'anki':
+            label_style_color(current_target_label, 'red')
+        if target == 'downloads':
+            label_style_color(current_target_label, 'blue')
+
         current_target_label.setText(target)
         state['current_target'] = target
     return f

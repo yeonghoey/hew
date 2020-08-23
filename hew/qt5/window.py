@@ -269,6 +269,31 @@ def slider(app, duration, current_time_label, set_position):
 
 
 @scheme
+def label_style_normal(app):
+    def f(label):
+        label.setStyleSheet(
+            'QLabel { color: black; background-color : transparent; }')
+    return f
+
+
+@scheme
+def label_style_color(app):
+    def f(label, color):
+        label.setStyleSheet(
+            f'QLabel {{color: {color}; background-color: transparent}}'
+        )
+    return f
+
+
+@scheme
+def label_style_notice(app):
+    def f(label):
+        label.setStyleSheet(
+            "QLabel { color: black; background-color : yellow; }")
+    return f
+
+
+@scheme
 def clipbox(app, font_metrics):
     text = QPlainTextEdit()
     text.setReadOnly(True)

@@ -149,9 +149,15 @@ def shortcut_shift(shortcut, window):
 
 
 @scheme
-def shortcut_toggle_try_video(shortcut, video, state, try_video_label, try_video_label_text):
+def shortcut_toggle_try_video(shortcut, video, state,
+                              try_video_label, try_video_label_text,
+                              label_style_normal, label_style_color):
     def f():
         try_video = (video is not None) and (not state['try_video'])
+        if try_video:
+            label_style_normal(try_video_label)
+        else:
+            label_style_color(try_video_label, 'purple')
         try_video_label.setText(try_video_label_text(try_video))
         state['try_video'] = try_video
 
