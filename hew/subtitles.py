@@ -130,8 +130,8 @@ def compose_subtitles_baked_clip(subtitles_pri_map, subtitles_aux_map):
     return f
 
 
-def make_subtitlesclip(subtitles_pri_map, hewn_size, left, right, srt_padding, vpos):
-    spu, spec = subtitles_pri_map.current()
+def make_subtitlesclip(subtitles_map, hewn_size, left, right, srt_padding, vpos):
+    spu, spec = subtitles_map.current()
     if spu == -1:
         return None
 
@@ -147,6 +147,18 @@ def make_subtitlesclip(subtitles_pri_map, hewn_size, left, right, srt_padding, v
     margin_h = int(h * 0.05)
 
     def make_textclip(txt):
+        # NOTE: imagemagick may fail to retrieve the font, 'ArialUnicode', configured here.
+        # To make sure 'ArialUnicode' exists,
+        # check '/usr/local/Cellar/imagemagick/7.0.10-28/etc/ImageMagick-7/type.xml'
+        # and add a font declaration like:
+        # <type
+        #   format="ttf"
+        #   name="ArialUnicode"
+        #   fullname="Arial Unicode MS"
+        #   family="Arial Unicode"
+        #   glyphs="/System/Library/Fonts/Supplemental/Arial Unicode.ttf" />
+        # To check if it's correctly configuared:
+        # python -c 'from moviepy.editor import TextClip; print(TextClip.list("font"))'
         return TextClip(txt, size=size,
                         method='caption', align='center',
                         font='ArialUnicode', fontsize=36, color='white',
