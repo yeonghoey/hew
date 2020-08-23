@@ -52,13 +52,15 @@ def download_yt_captions(youtube, source_path):
 
 
 @scheme
-def subtitles_map(source_path, main_vlc):
+def subtitles_pri_map(source_path, main_vlc):
     return SubtitlesMap(source_path, main_vlc)
 
 
 @scheme
-def subtitles_map_aux(source_path, main_vlc):
-    return SubtitlesMap(source_path, main_vlc)
+def subtitles_aux_map(source_path, main_vlc):
+    x = SubtitlesMap(source_path, main_vlc)
+    x.cycle()
+    return x
 
 
 class SubtitlesMap:
@@ -112,15 +114,15 @@ class SubtitlesMap:
 
 
 @scheme
-def compose_subtitles_baked_clip(subtitles_map, subtitles_map_aux):
+def compose_subtitles_baked_clip(subtitles_pri_map, subtitles_aux_map):
     def f(hewn, left, right, srt_padding):
         clips = [hewn]
         main_sub = make_subtitlesclip(
-            subtitles_map, hewn.size, left, right, srt_padding, is_auxiliary=False)
+            subtitles_pri_map, hewn.size, left, right, srt_padding, is_auxiliary=False)
         if main_sub is not None:
             clips.append(main_sub)
         aux_sub = make_subtitlesclip(
-            subtitles_map_aux, hewn.size, left, right, srt_padding, is_auxiliary=True)
+            subtitles_aux_map, hewn.size, left, right, srt_padding, is_auxiliary=True)
         if aux_sub is not None:
             clips.append(aux_sub)
         return CompositeVideoClip(clips)
@@ -128,8 +130,8 @@ def compose_subtitles_baked_clip(subtitles_map, subtitles_map_aux):
     return f
 
 
-def make_subtitlesclip(subtitles_map, hewn_size, left, right, srt_padding, is_auxiliary):
-    spu, spec = subtitles_map.current()
+def make_subtitlesclip(subtitles_pri_map, hewn_size, left, right, srt_padding, is_auxiliary):
+    spu, spec = subtitles_pri_map.current()
     if spu == -1:
         return None
 

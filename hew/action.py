@@ -184,7 +184,7 @@ def clip_downloads(clip, show_action):
 
 @scheme
 def dump_srt(state,
-             subtitles_map,
+             subtitles_pri_map,
              srt_padding,
              clip,
              show_action):
@@ -194,7 +194,7 @@ def dump_srt(state,
         if not path:
             return
 
-        spu, spec = subtitles_map.current()
+        spu, spec = subtitles_pri_map.current()
         _, srt = spec
         if srt is None:
             return
@@ -228,14 +228,14 @@ def dump_recognized(state,
 
 
 @scheme
-def dump_primary(subtitles_map, dump_srt, dump_recognized):
+def dump_primary(subtitles_pri_map, dump_srt, dump_recognized):
     # NOTE: if subtitles exist, dump_srt should be primary
-    return (dump_srt if subtitles_map.is_loaded() else
+    return (dump_srt if subtitles_pri_map.is_loaded() else
             dump_recognized)
 
 
 @scheme
-def dump_secondary(subtitles_map, dump_primary, dump_srt, dump_recognized):
+def dump_secondary(subtitles_pri_map, dump_primary, dump_srt, dump_recognized):
     assert dump_primary in (dump_srt, dump_recognized)
     return (dump_recognized if dump_primary == dump_srt else dump_srt)
 
@@ -323,14 +323,14 @@ def take_snapshot(state,
 
 
 @scheme
-def reload_(main_vlc, main_path, set_current_player, subtitles_map, show_action):
+def reload_(main_vlc, main_path, set_current_player, subtitles_pri_map, show_action):
     def f():
         ms = main_vlc.get_time()
         main_vlc.set_mrl(main_path)
         main_vlc.play()
         main_vlc.set_time(ms)
 
-        spu, _ = subtitles_map.current()
+        spu, _ = subtitles_pri_map.current()
         main_vlc.video_set_spu(spu)
 
         set_current_player('main')
@@ -520,54 +520,54 @@ def move_to_start(main_vlc, state, show_action):
 
 
 @scheme
-def toggle_subtitles(main_view, main_vlc, subtitles_map, show_action):
+def toggle_subtitles(main_view, main_vlc, subtitles_pri_map, show_action):
     # Disable by default
-    subtitles_map.enabled = False
+    subtitles_pri_map.enabled = False
     main_vlc.video_set_spu(-1)
 
     def f():
-        subtitles_map.enabled = not subtitles_map.enabled
-        spu, spec = subtitles_map.current()
+        subtitles_pri_map.enabled = not subtitles_pri_map.enabled
+        spu, spec = subtitles_pri_map.current()
         name, _ = spec
         main_vlc.video_set_spu(spu)
-        status = 'enabled' if subtitles_map.enabled else 'disabled'
+        status = 'enabled' if subtitles_pri_map.enabled else 'disabled'
         show_action(f'subtitles({status}): {name}')
     return f
 
 
 @scheme
-def cycle_subtitles(main_view, main_vlc, subtitles_map, show_action, toggle_subtitles):
+def cycle_subtitles(main_view, main_vlc, subtitles_pri_map, show_action, toggle_subtitles):
     def f():
-        subtitles_map.cycle()
-        spu, spec = subtitles_map.current()
+        subtitles_pri_map.cycle()
+        spu, spec = subtitles_pri_map.current()
         name, _ = spec
         main_vlc.video_set_spu(spu)
-        status = 'enabled' if subtitles_map.enabled else 'disabled'
+        status = 'enabled' if subtitles_pri_map.enabled else 'disabled'
         show_action(f'subtitles({status}): {name}')
     return f
 
 
 @scheme
-def toggle_subtitles_aux(main_view, subtitles_map_aux, show_action):
+def toggle_subtitles_aux(main_view, subtitles_aux_map, show_action):
     # Disable by default
-    subtitles_map_aux.enabled = False
+    subtitles_aux_map.enabled = False
 
     def f():
-        subtitles_map_aux.enabled = not subtitles_map_aux.enabled
-        _, spec = subtitles_map_aux.current()
+        subtitles_aux_map.enabled = not subtitles_aux_map.enabled
+        _, spec = subtitles_aux_map.current()
         name, _ = spec
-        status = 'enabled' if subtitles_map_aux.enabled else 'disabled'
+        status = 'enabled' if subtitles_aux_map.enabled else 'disabled'
         show_action(f'subtitles_aux({status}): {name}')
     return f
 
 
 @scheme
-def cycle_subtitles_aux(main_view, subtitles_map_aux, show_action, toggle_subtitles_aux):
+def cycle_subtitles_aux(main_view, subtitles_aux_map, show_action, toggle_subtitles_aux):
     def f():
-        subtitles_map_aux.cycle()
-        _, spec = subtitles_map_aux.current()
+        subtitles_aux_map.cycle()
+        _, spec = subtitles_aux_map.current()
         name, _ = spec
-        status = 'enabled' if subtitles_map_aux.enabled else 'disabled'
+        status = 'enabled' if subtitles_aux_map.enabled else 'disabled'
         show_action(f'subtitles_aux({status}): {name}')
 
     return f
