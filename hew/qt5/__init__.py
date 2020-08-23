@@ -74,6 +74,7 @@ def settings(app):
 def save_settings(app, settings, window, main_view, state):
     def f():
         settings.setValue('current_target', state['current_target'])
+        settings.setValue('bg_under_subtitles', state['bg_under_subtitles'])
         settings.setValue('geometry', window.saveGeometry())
         if main_view is not None:
             settings.setValue('scale', state.get('scale', 1.0))
@@ -81,7 +82,8 @@ def save_settings(app, settings, window, main_view, state):
 
 
 @scheme
-def restore_settings(app, settings, window, main_view, sub_view, resize, set_current_target):
+def restore_settings(app, settings, window, main_view, sub_view, resize, set_current_target,
+                     state, update_subtitles_pri_label, update_subtitles_aux_label):
     g = settings.value('geometry', None)
     if g is not None:
         window.restoreGeometry(g)
@@ -89,6 +91,12 @@ def restore_settings(app, settings, window, main_view, sub_view, resize, set_cur
     current_target = settings.value('current_target', None)
     if current_target is not None:
         set_current_target(current_target)
+
+    bg_under_subtitles = settings.value('bg_under_subtitles', None)
+    if bg_under_subtitles is not None:
+        state['bg_under_subtitles'] = bg_under_subtitles
+        update_subtitles_pri_label()
+        update_subtitles_aux_label()
 
     if (main_view is not None) and (sub_view is not None):
         s = settings.value('scale', 1.0, type=float)

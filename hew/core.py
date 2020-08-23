@@ -121,4 +121,5 @@ def state(video):
         'current_player': 'main',  # main or sub
         'current_target': 'anki',  # anki or downloads
         'before_jump': None,
+        'bg_under_subtitles': False,
     }

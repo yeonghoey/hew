@@ -87,8 +87,8 @@ def shortcut_hew(shortcut, hew):
 
 
 @scheme
-def shortcut_hew_bg_on_subtitles(shortcut, hew):
-    return shortcut(['Shift+h', 'Shift+ㅗ'], lambda: hew(bg_on_subtitles=True))
+def shortcut_toggle_bg_under_subtitles(shortcut, toggle_bg_under_subtitles):
+    return shortcut(['b', 'ㅠ'], toggle_bg_under_subtitles)
 
 
 @scheme

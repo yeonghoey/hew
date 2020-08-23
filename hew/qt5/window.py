@@ -193,27 +193,33 @@ def subtitles_aux_label(app):
 
 
 @scheme
-def update_subtitles_pri_label(subtitles_pri_label, subtitles_pri_map, label_style_color):
+def update_subtitles_pri_label(subtitles_pri_label, subtitles_pri_map, label_style_color, state):
     def f():
         update_subtitles_label(subtitles_pri_label,
-                               subtitles_pri_map, label_style_color)
+                               subtitles_pri_map, label_style_color, state['bg_under_subtitles'])
     return f
 
 
 @scheme
-def update_subtitles_aux_label(subtitles_aux_label, subtitles_aux_map, label_style_color):
+def update_subtitles_aux_label(subtitles_aux_label, subtitles_aux_map, label_style_color, state):
     def f():
         update_subtitles_label(subtitles_aux_label,
-                               subtitles_aux_map, label_style_color)
+                               subtitles_aux_map, label_style_color, state['bg_under_subtitles'])
 
     return f
 
 
-def update_subtitles_label(label, smap, color):
+def update_subtitles_label(label, smap, color, bg_under_subtitles):
     _, spec = smap.current()
     name, _ = spec
     label.setText(name)
-    color(label, 'black' if smap.enabled else 'lightgray')
+    if smap.enabled:
+        if bg_under_subtitles:
+            color(label, 'white', 'black')
+        else:
+            color(label, 'black', 'transparent')
+    else:
+        color(label, 'lightgray', 'transparent')
 
 
 @scheme
@@ -321,10 +327,9 @@ def label_style_normal(app):
 
 @scheme
 def label_style_color(app):
-    def f(label, color):
+    def f(label, color, bg_color='transparent'):
         label.setStyleSheet(
-            f'QLabel {{color: {color}; background-color: transparent}}'
-        )
+            f'QLabel {{color: {color}; background-color: {bg_color}; }}')
     return f
 
 

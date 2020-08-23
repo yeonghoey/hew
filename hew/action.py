@@ -99,7 +99,7 @@ def hew(main_vlc,
         clip_downloads,
         play_hewn):
 
-    def f(bg_on_subtitles=False):
+    def f():
         dirname = get_current_target_path()
         left = state['left']
         right = state['right']
@@ -118,7 +118,7 @@ def hew(main_vlc,
                 ffmpeg_params.extend(['-vf', 'scale=%s:%s' % (w, h)])
 
             composed = compose_subtitles_baked_clip(
-                hewn, left, right, srt_padding, bg_on_subtitles)
+                hewn, left, right, srt_padding, state['bg_under_subtitles'])
 
             # Codecs chosen for HTML5
             composed.write_videofile(temppath,
@@ -571,6 +571,16 @@ def cycle_subtitles_aux(main_view, subtitles_aux_map, show_action, toggle_subtit
         show_action(f'subtitles_aux: {name}')
         update_subtitles_aux_label()
 
+    return f
+
+
+@scheme
+def toggle_bg_under_subtitles(state, update_subtitles_pri_label, update_subtitles_aux_label, show_action):
+    def f():
+        state['bg_under_subtitles'] = not state['bg_under_subtitles']
+        update_subtitles_pri_label()
+        update_subtitles_aux_label()
+        show_action(f'bg_under_subtitles: {state["bg_under_subtitles"]}')
     return f
 
 

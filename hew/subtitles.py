@@ -115,14 +115,14 @@ class SubtitlesMap:
 
 @scheme
 def compose_subtitles_baked_clip(subtitles_pri_map, subtitles_aux_map):
-    def f(hewn, left, right, srt_padding, bg_on_subtitles):
+    def f(hewn, left, right, srt_padding, bg_under_subtitles):
         clips = [hewn]
         main_sub = make_subtitlesclip(
-            subtitles_pri_map, hewn.size, left, right, srt_padding, bg_on_subtitles, vpos='bottom')
+            subtitles_pri_map, hewn.size, left, right, srt_padding, bg_under_subtitles, vpos='bottom')
         if main_sub is not None:
             clips.append(main_sub)
         aux_sub = make_subtitlesclip(
-            subtitles_aux_map, hewn.size, left, right, srt_padding, bg_on_subtitles, vpos='top')
+            subtitles_aux_map, hewn.size, left, right, srt_padding, bg_under_subtitles, vpos='top')
         if aux_sub is not None:
             clips.append(aux_sub)
         return CompositeVideoClip(clips)
@@ -130,7 +130,7 @@ def compose_subtitles_baked_clip(subtitles_pri_map, subtitles_aux_map):
     return f
 
 
-def make_subtitlesclip(subtitles_pri_map, hewn_size, left, right, srt_padding, bg_on_subtitles, vpos):
+def make_subtitlesclip(subtitles_pri_map, hewn_size, left, right, srt_padding, bg_under_subtitles, vpos):
     spu, spec = subtitles_pri_map.current()
     if spu == -1:
         return None
@@ -143,9 +143,9 @@ def make_subtitlesclip(subtitles_pri_map, hewn_size, left, right, srt_padding, b
     w, h = hewn_size
     # NOTE: Stick to the screen edge when using bg,
     # put some margins otherwise.
-    size = (w if bg_on_subtitles else int(w*0.8), None)
-    margin_h = 0 if bg_on_subtitles else int(h * 0.05)
-    bg_color = 'black' if bg_on_subtitles else 'transparent'
+    size = (w if bg_under_subtitles else int(w*0.8), None)
+    margin_h = 0 if bg_under_subtitles else int(h * 0.05)
+    bg_color = 'black' if bg_under_subtitles else 'transparent'
 
     def make_textclip(txt):
         return TextClip(txt, size=size,
