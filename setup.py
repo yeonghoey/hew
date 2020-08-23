@@ -28,7 +28,7 @@ setup(
         'google-cloud-speech==1.3.2',
         'moviepy==1.0.3',
         'pyperclip==1.6.0',
-        'PyQt5==5.10',
+        'PyQt5==5.15',
         'pysrt==1.1.1',
         'python-vlc==3.0.102',
         'pytimeparse==1.1.7',
