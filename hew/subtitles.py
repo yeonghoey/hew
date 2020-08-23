@@ -149,8 +149,8 @@ def make_subtitlesclip(subtitles_pri_map, hewn_size, left, right, srt_padding, v
     def make_textclip(txt):
         return TextClip(txt, size=size,
                         method='caption', align='center',
-                        font='ArialUnicode', fontsize=42, color='white',
-                        bg_color='rgba(0,0,0,0.5)')
+                        font='ArialUnicode', fontsize=36, color='white',
+                        bg_color='rgba(0,0,0,0.6)')
 
     subtitlesclip = SubtitlesClip(subsrt_path, make_textclip)
 
