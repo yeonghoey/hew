@@ -115,14 +115,14 @@ class SubtitlesMap:
 
 @scheme
 def compose_subtitles_baked_clip(subtitles_pri_map, subtitles_aux_map):
-    def f(hewn, left, right, srt_padding):
+    def f(hewn, left, right, srt_padding, bg_on_subtitles):
         clips = [hewn]
         main_sub = make_subtitlesclip(
-            subtitles_pri_map, hewn.size, left, right, srt_padding, is_auxiliary=False)
+            subtitles_pri_map, hewn.size, left, right, srt_padding, bg_on_subtitles, vpos='bottom')
         if main_sub is not None:
             clips.append(main_sub)
         aux_sub = make_subtitlesclip(
-            subtitles_aux_map, hewn.size, left, right, srt_padding, is_auxiliary=True)
+            subtitles_aux_map, hewn.size, left, right, srt_padding, bg_on_subtitles, vpos='top')
         if aux_sub is not None:
             clips.append(aux_sub)
         return CompositeVideoClip(clips)
@@ -130,7 +130,7 @@ def compose_subtitles_baked_clip(subtitles_pri_map, subtitles_aux_map):
     return f
 
 
-def make_subtitlesclip(subtitles_pri_map, hewn_size, left, right, srt_padding, is_auxiliary):
+def make_subtitlesclip(subtitles_pri_map, hewn_size, left, right, srt_padding, bg_on_subtitles, vpos):
     spu, spec = subtitles_pri_map.current()
     if spu == -1:
         return None
@@ -140,24 +140,50 @@ def make_subtitlesclip(subtitles_pri_map, hewn_size, left, right, srt_padding, i
     if subsrt_path is None:
         return None
 
-    # NOTE: Placing subtitles is tricky.
-    # TextClip determines the base size, but there is no way to specify the base position.
-    # There's one other concept, caption and align, affects the vertical position.
-    # In the meantime, SubtitlesClip determine the whole base position.
-    # align='South' and set_position=('center', 'top') will place at the bottom
-    # of the video, as expected.
     w, h = hewn_size
-    size = (int(w*0.8), int(h*0.95))
-    align = 'South' if not is_auxiliary else 'North'
-    vpos = 'top' if not is_auxiliary else 'bottom'
+    # NOTE: Stick to the screen edge when using bg,
+    # put some margins otherwise.
+    size = (w if bg_on_subtitles else int(w*0.8), None)
+    margin_h = 0 if bg_on_subtitles else int(h * 0.05)
+    bg_color = 'black' if bg_on_subtitles else 'transparent'
 
     def make_textclip(txt):
         return TextClip(txt, size=size,
-                        method='caption', align=align,
-                        font='ArialUnicode', fontsize=36, color='white')
+                        method='caption', align='center',
+                        font='ArialUnicode', fontsize=36, color='white',
+                        bg_color=bg_color)
 
     subtitlesclip = SubtitlesClip(subsrt_path, make_textclip)
-    return subtitlesclip.set_position(("center", vpos))
+
+    def blit_on(self, picture, t):
+        # Monkey patch 'blit_on' to place subtitle relative to its dynamic size
+        # The block below copied from moviepy.
+        #################################################################################################
+        hf, wf = framesize = picture.shape[:2]
+
+        if self.ismask and picture.max():
+            return np.minimum(1, picture + self.blit_on(np.zeros(framesize), t))
+
+        ct = t - self.start  # clip time
+
+        # GET IMAGE AND MASK IF ANY
+
+        img = self.get_frame(ct)
+        mask = self.mask.get_frame(ct) if self.mask else None
+
+        if mask is not None and ((img.shape[0] != mask.shape[0]) or (img.shape[1] != mask.shape[1])):
+            img = self.fill_array(img, mask.shape)
+
+        hi, wi = img.shape[:2]
+        #################################################################################################
+        pos_x = (wf - wi) / 2  # center
+        pos_y = margin_h if vpos == 'top' else (hf - hi - margin_h)
+        pos = map(int, (pos_x, pos_y))
+        from moviepy.video.tools.drawing import blit
+        return blit(img, picture, pos, mask=mask, ismask=self.ismask)
+
+    subtitlesclip.blit_on = blit_on.__get__(subtitlesclip)
+    return subtitlesclip
 
 
 def subsrt(srt, left, right, srt_padding):

@@ -99,7 +99,7 @@ def hew(main_vlc,
         clip_downloads,
         play_hewn):
 
-    def f():
+    def f(bg_on_subtitles=False):
         dirname = get_current_target_path()
         left = state['left']
         right = state['right']
@@ -118,7 +118,7 @@ def hew(main_vlc,
                 ffmpeg_params.extend(['-vf', 'scale=%s:%s' % (w, h)])
 
             composed = compose_subtitles_baked_clip(
-                hewn, left, right, srt_padding)
+                hewn, left, right, srt_padding, bg_on_subtitles)
 
             # Codecs chosen for HTML5
             composed.write_videofile(temppath,

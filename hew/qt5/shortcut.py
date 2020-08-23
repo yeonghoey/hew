@@ -87,6 +87,11 @@ def shortcut_hew(shortcut, hew):
 
 
 @scheme
+def shortcut_hew_bg_on_subtitles(shortcut, hew):
+    return shortcut(['Shift+h', 'Shift+ㅗ'], lambda: hew(bg_on_subtitles=True))
+
+
+@scheme
 def shortcut_dump_primary(shortcut, dump_primary):
     return shortcut(['d', 'ㅇ'], dump_primary)
 
