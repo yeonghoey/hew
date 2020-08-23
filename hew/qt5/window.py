@@ -133,6 +133,8 @@ def layout(app, indicator_layout, slider_layout, clipbox):
 @scheme
 def indicator_layout(app,
                      title_label,
+                     subtitles_pri_label,
+                     subtitles_aux_label,
                      mark_label,
                      current_player_label,
                      current_target_label,
@@ -144,6 +146,11 @@ def indicator_layout(app,
 
     left = QVBoxLayout()
     left.addWidget(title_label)
+    lbottom = QHBoxLayout()
+    lbottom.addWidget(subtitles_pri_label)
+    lbottom.addWidget(subtitles_aux_label)
+    lbottom.addStretch(1)
+    left.addLayout(lbottom)
     layout.addLayout(left, stretch=2)
 
     layout.addSpacing(font_metrics.width('mm'))
@@ -171,6 +178,42 @@ def indicator_layout(app,
 def title_label(app, title):
     label = QLabel(title)
     return label
+
+
+@scheme
+def subtitles_pri_label(app):
+    label = QLabel()
+    return label
+
+
+@scheme
+def subtitles_aux_label(app):
+    label = QLabel()
+    return label
+
+
+@scheme
+def update_subtitles_pri_label(subtitles_pri_label, subtitles_pri_map, label_style_color):
+    def f():
+        update_subtitles_label(subtitles_pri_label,
+                               subtitles_pri_map, label_style_color)
+    return f
+
+
+@scheme
+def update_subtitles_aux_label(subtitles_aux_label, subtitles_aux_map, label_style_color):
+    def f():
+        update_subtitles_label(subtitles_aux_label,
+                               subtitles_aux_map, label_style_color)
+
+    return f
+
+
+def update_subtitles_label(label, smap, color):
+    _, spec = smap.current()
+    name, _ = spec
+    label.setText(name)
+    color(label, 'black' if smap.enabled else 'lightgray')
 
 
 @scheme

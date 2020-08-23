@@ -520,55 +520,56 @@ def move_to_start(main_vlc, state, show_action):
 
 
 @scheme
-def toggle_subtitles(main_view, main_vlc, subtitles_pri_map, show_action):
+def toggle_subtitles(main_view, main_vlc, subtitles_pri_map, show_action, update_subtitles_pri_label):
     # Disable by default
     subtitles_pri_map.enabled = False
     main_vlc.video_set_spu(-1)
+    update_subtitles_pri_label()
 
     def f():
         subtitles_pri_map.enabled = not subtitles_pri_map.enabled
         spu, spec = subtitles_pri_map.current()
-        name, _ = spec
         main_vlc.video_set_spu(spu)
         status = 'enabled' if subtitles_pri_map.enabled else 'disabled'
-        show_action(f'subtitles({status}): {name}')
+        show_action(f'subtitles_pri: {status}')
+        update_subtitles_pri_label()
     return f
 
 
 @scheme
-def cycle_subtitles(main_view, main_vlc, subtitles_pri_map, show_action, toggle_subtitles):
+def cycle_subtitles(main_view, main_vlc, subtitles_pri_map, show_action, toggle_subtitles, update_subtitles_pri_label):
     def f():
         subtitles_pri_map.cycle()
         spu, spec = subtitles_pri_map.current()
         name, _ = spec
         main_vlc.video_set_spu(spu)
-        status = 'enabled' if subtitles_pri_map.enabled else 'disabled'
-        show_action(f'subtitles({status}): {name}')
+        show_action(f'subtitles_pri: {name}')
+        update_subtitles_pri_label()
     return f
 
 
 @scheme
-def toggle_subtitles_aux(main_view, subtitles_aux_map, show_action):
+def toggle_subtitles_aux(main_view, subtitles_aux_map, show_action, update_subtitles_aux_label):
     # Disable by default
     subtitles_aux_map.enabled = False
+    update_subtitles_aux_label()
 
     def f():
         subtitles_aux_map.enabled = not subtitles_aux_map.enabled
-        _, spec = subtitles_aux_map.current()
-        name, _ = spec
         status = 'enabled' if subtitles_aux_map.enabled else 'disabled'
-        show_action(f'subtitles_aux({status}): {name}')
+        show_action(f'subtitles_aux: {status}')
+        update_subtitles_aux_label()
     return f
 
 
 @scheme
-def cycle_subtitles_aux(main_view, subtitles_aux_map, show_action, toggle_subtitles_aux):
+def cycle_subtitles_aux(main_view, subtitles_aux_map, show_action, toggle_subtitles_aux, update_subtitles_aux_label):
     def f():
         subtitles_aux_map.cycle()
         _, spec = subtitles_aux_map.current()
         name, _ = spec
-        status = 'enabled' if subtitles_aux_map.enabled else 'disabled'
-        show_action(f'subtitles_aux({status}): {name}')
+        show_action(f'subtitles_aux: {name}')
+        update_subtitles_aux_label()
 
     return f
 
