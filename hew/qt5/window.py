@@ -196,7 +196,7 @@ def subtitles_aux_label(app):
 def update_subtitles_pri_label(subtitles_pri_label, subtitles_pri_map, label_style_color, state):
     def f():
         update_subtitles_label(subtitles_pri_label,
-                               subtitles_pri_map, label_style_color, state['bg_under_subtitles'])
+                               subtitles_pri_map, label_style_color)
     return f
 
 
@@ -204,22 +204,19 @@ def update_subtitles_pri_label(subtitles_pri_label, subtitles_pri_map, label_sty
 def update_subtitles_aux_label(subtitles_aux_label, subtitles_aux_map, label_style_color, state):
     def f():
         update_subtitles_label(subtitles_aux_label,
-                               subtitles_aux_map, label_style_color, state['bg_under_subtitles'])
+                               subtitles_aux_map, label_style_color)
 
     return f
 
 
-def update_subtitles_label(label, smap, color, bg_under_subtitles):
+def update_subtitles_label(label, smap, color):
     _, spec = smap.current()
     name, _ = spec
     label.setText(name)
     if smap.enabled:
-        if bg_under_subtitles:
-            color(label, 'white', 'black')
-        else:
-            color(label, 'black', 'transparent')
+        color(label, 'black')
     else:
-        color(label, 'lightgray', 'transparent')
+        color(label, 'lightgray')
 
 
 @scheme

@@ -87,11 +87,6 @@ def shortcut_hew(shortcut, hew):
 
 
 @scheme
-def shortcut_toggle_bg_under_subtitles(shortcut, toggle_bg_under_subtitles):
-    return shortcut(['b', 'ㅠ'], toggle_bg_under_subtitles)
-
-
-@scheme
 def shortcut_dump_primary(shortcut, dump_primary):
     return shortcut(['d', 'ㅇ'], dump_primary)
 
