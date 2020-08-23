@@ -1,12 +1,9 @@
 from collections import OrderedDict
-from io import StringIO
 import os
 from pathlib import Path
 import shutil
 
 import moviepy.audio.fx.all as afx
-from moviepy.editor import CompositeVideoClip, TextClip
-from moviepy.video.tools.subtitles import SubtitlesClip
 import pyperclip
 import pysrt
 
@@ -96,7 +93,7 @@ def hew(main_vlc,
         video,
         audio,
         state,
-        subtitles_map,
+        compose_subtitles_baked_clip,
         srt_padding,
         clip_anki,
         clip_downloads,
@@ -119,35 +116,16 @@ def hew(main_vlc,
                 # ffmpeg requires sizes to be even
                 w, h = (w//2)*2, (h//2)*2
                 ffmpeg_params.extend(['-vf', 'scale=%s:%s' % (w, h)])
-            spu, spec = subtitles_map.current()
-            if spu != -1:
-                _, srt = spec
-                subsrt_path = subsrt(srt, left, right, srt_padding)
-                if subsrt_path is not None:
-                    # NOTE: Placing subtitles is tricky.
-                    # TextClip determines the base size, but there is no way to specify the base position.
-                    # There's one other concept, caption and align, affects the vertical position.
-                    # In the meantime, SubtitlesClip determine the whole base position.
-                    # align='South' and set_position=('center', 'top') will place at the bottom
-                    # of the video, as expected.
-                    def make_textclip(txt):
-                        w, h = hewn.size
-                        size = (int(w*0.8), int(h*0.95))
-                        return TextClip(txt, size=size,
-                                        method='caption', align='South',
-                                        font='ArialUnicode', fontsize=36, color='white')
-                    subsrtclip = SubtitlesClip(subsrt_path, make_textclip)
-                    print('subsrt', subsrtclip)
 
-                    hewn = CompositeVideoClip(
-                        [hewn, subsrtclip.set_position(("center", "top"))])
+            composed = compose_subtitles_baked_clip(
+                hewn, left, right, srt_padding)
 
             # Codecs chosen for HTML5
-            hewn.write_videofile(temppath,
-                                 codec='libx264',
-                                 audio=not video_no_sound,
-                                 audio_codec='aac',
-                                 ffmpeg_params=ffmpeg_params)
+            composed.write_videofile(temppath,
+                                     codec='libx264',
+                                     audio=not video_no_sound,
+                                     audio_codec='aac',
+                                     ffmpeg_params=ffmpeg_params)
             filename = sha1of(temppath) + '.mp4'
             filepath = os.path.join(dirname, filename)
             shutil.move(temppath, filepath)
@@ -183,27 +161,6 @@ def subclip(clip, left, right):
         clip.subclip(left/1000., right/1000.)
             .fx(afx.audio_normalize)
     )
-
-
-def subsrt(srt, left, right, srt_padding):
-    sliced = srt.slice(starts_after=left - srt_padding,
-                       ends_before=right + srt_padding)
-    if not sliced:
-        return None
-
-    # NOTE: The result of slice still references srt items in
-    # the original srt. There seems no way a way to deep copy,
-    # So export as a text and recreate from it.
-    buf = StringIO()
-    sliced.write_into(buf)
-    ss = pysrt.from_string(buf.getvalue())
-
-    # Do some modifications on it.
-    ss.clean_indexes()
-    ss.shift(milliseconds=-left)
-    path = tempfile_path('.srt')
-    ss.save(path, encoding='utf-8')
-    return path
 
 
 @scheme
@@ -587,6 +544,31 @@ def cycle_subtitles(main_view, main_vlc, subtitles_map, show_action, toggle_subt
         main_vlc.video_set_spu(spu)
         status = 'enabled' if subtitles_map.enabled else 'disabled'
         show_action(f'subtitles({status}): {name}')
+    return f
+
+
+@scheme
+def toggle_subtitles_aux(main_view, subtitles_map_aux, show_action):
+    # Disable by default
+    subtitles_map_aux.enabled = False
+
+    def f():
+        subtitles_map_aux.enabled = not subtitles_map_aux.enabled
+        _, spec = subtitles_map_aux.current()
+        name, _ = spec
+        status = 'enabled' if subtitles_map_aux.enabled else 'disabled'
+        show_action(f'subtitles_aux({status}): {name}')
+    return f
+
+
+@scheme
+def cycle_subtitles_aux(main_view, subtitles_map_aux, show_action, toggle_subtitles_aux):
+    def f():
+        subtitles_map_aux.cycle()
+        _, spec = subtitles_map_aux.current()
+        name, _ = spec
+        status = 'enabled' if subtitles_map_aux.enabled else 'disabled'
+        show_action(f'subtitles_aux({status}): {name}')
 
     return f
 

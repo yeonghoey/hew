@@ -1,11 +1,14 @@
 from collections import OrderedDict
+from io import StringIO
 from pathlib import Path
 import re
 
 import click
+from moviepy.editor import CompositeVideoClip, TextClip
+from moviepy.video.tools.subtitles import SubtitlesClip
 import pysrt
 
-from hew.util import Scheme
+from hew.util import Scheme, tempfile_path
 
 
 scheme = Scheme()
@@ -50,6 +53,11 @@ def download_yt_captions(youtube, source_path):
 
 @scheme
 def subtitles_map(source_path, main_vlc):
+    return SubtitlesMap(source_path, main_vlc)
+
+
+@scheme
+def subtitles_map_aux(source_path, main_vlc):
     return SubtitlesMap(source_path, main_vlc)
 
 
@@ -101,3 +109,71 @@ class SubtitlesMap:
             return next(iter(self._loaded_subtitles.items()))
         else:
             return (-1, ('default', None))
+
+
+@scheme
+def compose_subtitles_baked_clip(subtitles_map, subtitles_map_aux):
+    def f(hewn, left, right, srt_padding):
+        clips = [hewn]
+        main_sub = make_subtitlesclip(
+            subtitles_map, hewn.size, left, right, srt_padding, is_auxiliary=False)
+        if main_sub is not None:
+            clips.append(main_sub)
+        aux_sub = make_subtitlesclip(
+            subtitles_map_aux, hewn.size, left, right, srt_padding, is_auxiliary=True)
+        if aux_sub is not None:
+            clips.append(aux_sub)
+        return CompositeVideoClip(clips)
+
+    return f
+
+
+def make_subtitlesclip(subtitles_map, hewn_size, left, right, srt_padding, is_auxiliary):
+    spu, spec = subtitles_map.current()
+    if spu == -1:
+        return None
+
+    _, srt = spec
+    subsrt_path = subsrt(srt, left, right, srt_padding)
+    if subsrt_path is None:
+        return None
+
+    # NOTE: Placing subtitles is tricky.
+    # TextClip determines the base size, but there is no way to specify the base position.
+    # There's one other concept, caption and align, affects the vertical position.
+    # In the meantime, SubtitlesClip determine the whole base position.
+    # align='South' and set_position=('center', 'top') will place at the bottom
+    # of the video, as expected.
+    w, h = hewn_size
+    size = (int(w*0.8), int(h*0.95))
+    align = 'South' if not is_auxiliary else 'North'
+    vpos = 'top' if not is_auxiliary else 'bottom'
+
+    def make_textclip(txt):
+        return TextClip(txt, size=size,
+                        method='caption', align=align,
+                        font='ArialUnicode', fontsize=36, color='white')
+
+    subtitlesclip = SubtitlesClip(subsrt_path, make_textclip)
+    return subtitlesclip.set_position(("center", vpos))
+
+
+def subsrt(srt, left, right, srt_padding):
+    sliced = srt.slice(starts_after=left - srt_padding,
+                       ends_before=right + srt_padding)
+    if not sliced:
+        return None
+
+    # NOTE: The result of slice still references srt items in
+    # the original srt. There seems no way a way to deep copy,
+    # So export as a text and recreate from it.
+    buf = StringIO()
+    sliced.write_into(buf)
+    ss = pysrt.from_string(buf.getvalue())
+
+    # Do some modifications on it.
+    ss.clean_indexes()
+    ss.shift(milliseconds=-left)
+    path = tempfile_path('.srt')
+    ss.save(path, encoding='utf-8')
+    return path

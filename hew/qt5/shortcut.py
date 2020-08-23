@@ -180,6 +180,16 @@ def shortcut_cycle_subtitles(shortcut, cycle_subtitles):
 
 
 @scheme
+def shortcut_toggle_subtitles_aux(shortcut, toggle_subtitles_aux):
+    return shortcut(['v', 'ㅍ'], toggle_subtitles_aux)
+
+
+@scheme
+def shortcut_cycle_subtitles_aux(shortcut, cycle_subtitles_aux):
+    return shortcut(['Shift+v', 'Shift+ㅍ'], cycle_subtitles_aux)
+
+
+@scheme
 def shortcut_return_before_jump(shortcut, return_before_jump):
     return shortcut(['\\'], return_before_jump)
 
