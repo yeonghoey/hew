@@ -36,13 +36,8 @@ def app():
 
 
 @scheme
-def monkeypatch_app(app, save_settings):
-    def event(self, e):
-        # save_settings on quit
-        if e.type() == QEvent.Close:
-            save_settings()
-        return super(app.__class__, self).event(e)
-    app.event = event.__get__(app, QApplication)
+def register_save_when_quit(app, save_settings):
+    app.aboutToQuit.connect(save_settings)
 
 
 @scheme
