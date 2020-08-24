@@ -29,20 +29,26 @@ def download_yt_captions(youtube, source_path):
     if youtube is None:
         return
 
-    captions_interested_in = (
-        youtube.captions.get_by_language_code(l['code'])
-        for l in LANGUAGES_INTERESTED_IN)
-
-    existing_captions_interested_in = filter(
-        lambda x: x is not None,
-        captions_interested_in)
+    # NOTE: For some reason, in some cases,
+    # "youtube.captions" picks auto-generated captions which supersede
+    # the human-generated one. To avoid this, manually filter
+    # auto-generated captions from the all caption tracks.
+    captions_interested_in = []
+    for caption in youtube.caption_tracks:
+        if 'auto' in caption.name:
+            continue
+        if '자동' in caption.name:
+            continue
+        if caption.code in {spec['code'] for spec in LANGUAGES_INTERESTED_IN}:
+            captions_interested_in.append(caption)
 
     video_path = Path(source_path)
-    for caption in existing_captions_interested_in:
+    for caption in captions_interested_in:
         name = video_path.stem
         caption_name = f'{name}.{caption.code}.srt'
         caption_path = video_path.parent / caption_name
-        click.secho("Download: '%s'" % caption_path, fg='yellow')
+        click.secho(
+            f'Download: "{caption_path}" ({caption.name})', fg='yellow')
         with open(caption_path, 'w') as f:
             try:
                 f.write(caption.generate_srt_captions())
