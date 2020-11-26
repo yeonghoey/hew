@@ -19,6 +19,7 @@ scheme = Scheme()
 # The only way to handle it is to manually map these names.
 LANGUAGES_INTERESTED_IN = [
     {'code': 'en', 'vlc_name': 'English'},
+    {'code': 'en-US', 'vlc_name': 'en-US'},
     {'code': 'en-GB', 'vlc_name': 'en-GB'},
     {'code': 'ko', 'vlc_name': 'Korean'},
 ]
@@ -116,7 +117,7 @@ class SubtitlesMap:
         if self._loaded_subtitles:
             return next(iter(self._loaded_subtitles.items()))
         else:
-            return (-1, ('default', None))
+            return (-1, ('-', None))
 
 
 @scheme
