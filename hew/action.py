@@ -442,8 +442,8 @@ def resize(screen, window, main_view, sub_view, video, state):
             scale = state['scale'] * x
 
         w, h = video.size
-        width = min(max(64, w*scale), screen.width())
-        height = min(max(64, h*scale), screen.height())
+        width = max(64, w*scale)
+        height = max(64, h*scale)
         if w*scale == width and h*scale == height:
             main_view.setFixedWidth(width)
             main_view.setFixedHeight(height)
